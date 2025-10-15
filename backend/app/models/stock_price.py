@@ -1,0 +1,19 @@
+from sqlalchemy import Integer, String, Float, ForeignKey, Date
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from app.db.session import Base
+from datetime import date
+
+
+class StockPrice(Base):
+    __tablename__ = "stock_prices"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    stock_id: Mapped[int] = mapped_column(ForeignKey("stocks.id"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    open_price: Mapped[float] = mapped_column(Float, nullable=True)
+    high_price: Mapped[float] = mapped_column(Float, nullable=True)
+    low_price: Mapped[float] = mapped_column(Float, nullable=True)
+    close_price: Mapped[float] = mapped_column(Float, nullable=False)
+    volume: Mapped[int] = mapped_column(Integer, nullable=True)
+
+    stock: Mapped["Stock"] = relationship("Stock", back_populates="prices")
