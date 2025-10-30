@@ -9,7 +9,7 @@ from app.models.stock import Stock
 def fetch_and_store_stock_prices(session: Session, stock_id: int, ticker: str):
     try:
         stock_data = yf.Ticker(ticker)
-        hist = stock_data.history(period="1y")  # Fetch 1 year of historical data
+        hist = stock_data.history(period="5y")  # Fetch 1 year of historical data
     except Exception as e:
         print(f"Error fetching data for {ticker}: {e}")
         return

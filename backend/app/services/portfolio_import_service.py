@@ -1,9 +1,4 @@
 
-from pathlib import Path
-
-DATA_ROOT = Path(__file__).resolve().parents[2] / "tests" / "data"
-
-
 import pandas as pd
 from typing import IO, Any
 import app.crud.position_crud
@@ -38,15 +33,4 @@ def normalize_position(isin:str, quantity: int, buy_price: int, db, portfolio_id
         portfolio_id=portfolio_id,
         stock_id=stock.id,
         buy_price=buy_price
-
     )
-
-
-
-    
-
-
-
-
-if __name__ == "__main__":
-    parse_csv(DATA_ROOT / "nordnet-ostoerittain.csv", portfolio_id=1)

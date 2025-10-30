@@ -9,6 +9,7 @@ class Stock(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     ticker: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    isin: Mapped[Optional[str]] = mapped_column(String, unique=False, index=True, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     close_price: Mapped[float] = mapped_column(Float, nullable=False)
     sector: Mapped[Optional[str]] = mapped_column(String, nullable=True)

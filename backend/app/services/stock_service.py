@@ -3,29 +3,30 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from app.schemas.stock import StockCreate
 from app.crud import stock_crud
+import json
 
-Helsinki_Tickers = [
-    "NOKIA.HE", "KEMIRA.HE",  "WRT1V.HE",
-    "UPM.HE", "STERV.HE", "ORNBV.HE", "NESTE.HE", "RAIVV.HE",
-    "ELISA.HE", "FORTUM.HE", "METSO.HE", "MANTA.HE",
-    "TYRES.HE", "KCR.HE", "HUH1V.HE", "VALMET.HE", "TIETO.HE", "ORNBV.HE",
-    "KESKOB.HE", "KOJAMO.HE", "SSABBH.HE", "STERV.HE", "NDA-FI.HE", "KOJAMO.HE"
-]
+
+
 
 def fetch_and_store_stocks(session: Session):
-    for ticker in Helsinki_Tickers:
+    #File will be changed to EOD api
+    with open("app/json/stock_data.json") as f:
+        Helsinki_Tickers = json.load(f)
+    for ticker, isin in Helsinki_Tickers.items():
         try: 
-            stock_data = yf.Ticker(ticker).info
-        except:
+            ticker_client = yf.Ticker(ticker)
+            stock_data = ticker_client.info
+            
+        except Exception:
             print('\ndid not fetch data for', ticker, '\n')
             continue
         if 'regularMarketPrice' in stock_data:
             stock = StockCreate(
                 ticker=ticker,
+                isin=isin,
                 name=stock_data.get('shortName', ''),
                 close_price=stock_data['regularMarketPrice'],
                 updated_at=datetime.utcnow(),
                 sector=stock_data.get('sector', '')
             )
-            stock_crud.create_stock(session, stock)
-
+            stock_crud.create_stock(session, stock) 
