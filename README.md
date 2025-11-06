@@ -1,0 +1,1 @@
+This is my investing copilots backend. The idea is to make quantative analysiss on portfolio level and have possibility to discuss the metrics with AI. AI is the translator of the commplex anlysis from the analysis. It translates it to plain understandable language.
