@@ -5,7 +5,7 @@ from app.security.hashing import hash_password
 from app.core.errors.exceptions import UsernameDuplicateError, EmailDuplicateError
 from app.crud.base_crud import BaseCrud
 
-class UserCrud(BaseCrud):
+class UserCrud(BaseCrud[User]):
     model = User
     def get_user_by_email(self, email:str) -> User | None:
         return self.db.query(User).filter(User.email == email).first()

@@ -1,20 +1,24 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional, Annotated
+from datetime import datetime
 
-class PortfolioCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
+class PortfolioBase(BaseModel):
+    name: Optional[Annotated[str, Field(min_length=2, max_length=20)]] = "Untitled Portfolio"
+    description: Optional[Annotated[str, Field(max_length=100)]] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class PortfolioCreate(PortfolioBase):
     user_id: int
 
-class PortfolioRead(BaseModel):
+class PortfolioRead(PortfolioBase):
     id: int
-    name: str
-    description: Optional[str] = None
     user_id: int
+    created_at: datetime
+    updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    
 
-class PortfolioUpdate(BaseModel):
+class PortfolioUpdate(PortfolioBase):
     name: Optional[str] = None
     description: Optional[str] = None

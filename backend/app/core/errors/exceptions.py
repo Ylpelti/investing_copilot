@@ -22,3 +22,12 @@ class NotFound(AppError):
     status_code = 404
     message = "Resource not found"
 
+class Forbidden(AppError):
+    status_code = 403
+    message = "Unsufficient permission"
+
+class BadRequest(AppError):
+    status_code = 400
+    message = "Bad request"
+    
+

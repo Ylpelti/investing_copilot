@@ -1,35 +1,60 @@
-from sqlalchemy.orm import Session
+import logging
+from sqlalchemy.exc import IntegrityError
 from app.models.portfolio import Portfolio
-from app.schemas.portfolio import PortfolioCreate, PortfolioRead
-from fastapi import HTTPException
+from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
+from app.crud.base_crud import BaseCrud
+from typing import List
+from app.core.errors.exceptions import NotFound, Forbidden, BadRequest
+
+logger = logging.getLogger(__name__)
+
+class PortfolioCrud(BaseCrud[Portfolio]):
+    model = Portfolio
+
+    def create_portfolio(self, portfolio:PortfolioCreate) -> Portfolio:
+        db_portfolio = Portfolio(
+           name = portfolio.name,
+           description=portfolio.description,
+           user_id=portfolio.user_id 
+        )
+        self.db.add(db_portfolio)
+        self.db.commit()
+        self.db.refresh(db_portfolio)
+        return db_portfolio
+    
+    def get_owned_portfolio(self, portfolio_id: int, user_id: int) -> Portfolio:
+        portfolio = self.get_by_id(portfolio_id)
+        if not portfolio:
+            raise NotFound()
+        if portfolio.user_id != user_id:
+            raise Forbidden()
+        return portfolio
+    
+    def update_portfolio(self, portfolio_id: int, portfolio_in: PortfolioUpdate, current_user_id: int) -> Portfolio:
+        portfolio = self.get_owned_portfolio(portfolio_id=portfolio_id, user_id=current_user_id)
+        data = portfolio_in.model_dump(exclude_unset=True)
+        for key, value in data.items():
+            setattr(portfolio, key, value)
+        try:
+            self.db.commit()
+            self.db.refresh(portfolio)
+        except IntegrityError as e:
+            self.db.rollback()
+            raise BadRequest(message="Invalid input data") 
+        except Exception as e:
+            self.db.rollback()
+            logger.exception(f"unexpected error updating portfolio {portfolio_id}")
+            raise
+        return portfolio
+            
+    def delete_portfolio(self, portfolio_id: int, current_user_id: int):
+        portfolio = self.get_owned_portfolio(portfolio_id=portfolio_id, user_id=current_user_id)
+        self.delete_by_id(portfolio.id)
+        logger.info(f"portofolio with id {portfolio.id} deleted")
+        return True
 
 
-def create_portfolio(db: Session, portfolio: PortfolioCreate) -> PortfolioRead:
-    db_portfolio = Portfolio(name=portfolio.name, user_id=portfolio.user_id)
-    db.add(db_portfolio)
-    db.commit()
-    db.refresh(db_portfolio)
-    return db_portfolio
-
-def read_portfolio(db: Session, portfolio_id: int, current_user) -> PortfolioRead | None:
-    portfolio = db.get(Portfolio, portfolio_id)
-    if not portfolio:
-        raise HTTPException(status_code=404, detail="Portfolio not found")
-    if portfolio.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to import into this portfolio")
-
-def read_positions_from_portfolio(db: Session, portfolio_id: int) -> list:
-    portfolio = db.get(Portfolio, portfolio_id)
-    if portfolio and portfolio.positions:
-        return portfolio.positions
-    return []
-
-def delete_portfolio(db: Session, portfolio_id: int) -> bool:
-    db_portfolio = db.get(Portfolio, portfolio_id)
-    if not db_portfolio:
-        return False
-    db.delete(db_portfolio)
-    db.commit()
-    return True
+            
+        
 
 

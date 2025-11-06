@@ -4,13 +4,20 @@ from app.db.session import SessionLocal, Base, engine
 from app.security.hashing import hash_password
 from datetime import datetime
 
+
 @pytest.fixture(scope="function")
 def test_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    yield db
-    db.close()
-    Base.metadata.drop_all(bind=engine)
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture
 def test_user(test_db):
@@ -22,7 +29,7 @@ def test_user(test_db):
 
 @pytest.fixture    
 def test_portfolio(test_db, test_user):
-    portfolio = models.Portfolio(name="Test portfolio", user_id=test_user.id)
+    portfolio = models.Portfolio(name="Test portfolio", user_id=test_user.id, description=None)
     test_db.add(portfolio)
     test_db.commit()
     test_db.refresh(portfolio)
