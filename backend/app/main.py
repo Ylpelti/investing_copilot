@@ -23,8 +23,8 @@ app.include_router(token.router)
 @app.on_event("startup")
 def startup_event():
     db = SessionLocal()
-    #fetch_and_store_stocks(db)
-    #fetch_and_store_stock_price(db)
+    fetch_and_store_stocks(db)
+    fetch_and_store_stock_price(db)
     
     
 

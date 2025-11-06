@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import date
 
-class StockPriceCreate(BaseModel):
+class StockPriceBase(BaseModel):
     stock_id: int
     date: date
     open_price: float
@@ -11,15 +11,12 @@ class StockPriceCreate(BaseModel):
     close_price: float
     volume: int
 
-class StockPriceRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class StockPriceCreate(StockPriceBase):
+    pass
+
+class StockPriceRead(StockPriceBase):
     id: int
-    stock_id: int
-    date: date
-    open_price: float
-    high_price: float
-    low_price: float
-    close_price: float
-    volume: int
-
-    class Config:
-        orm_mode = True
+    

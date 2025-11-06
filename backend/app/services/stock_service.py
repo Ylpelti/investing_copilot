@@ -1,14 +1,15 @@
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy.orm import Session
 from app.schemas.stock import StockCreate
-from app.crud import stock_crud
+from app.crud.stock_crud import StockCrud
 import json
 
 
 
 
-def fetch_and_store_stocks(session: Session):
+def fetch_and_store_stocks(db: Session):
+    crud = StockCrud(db)
     #File will be changed to EOD api
     with open("app/json/stock_data.json") as f:
         Helsinki_Tickers = json.load(f)
@@ -26,7 +27,7 @@ def fetch_and_store_stocks(session: Session):
                 isin=isin,
                 name=stock_data.get('shortName', ''),
                 close_price=stock_data['regularMarketPrice'],
-                updated_at=datetime.utcnow(),
+                updated_at=datetime.now(UTC),
                 sector=stock_data.get('sector', '')
             )
-            stock_crud.create_stock(session, stock) 
+            crud.create_stock(stock)

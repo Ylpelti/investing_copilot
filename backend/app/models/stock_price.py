@@ -17,3 +17,6 @@ class StockPrice(Base):
     volume: Mapped[int] = mapped_column(Integer, nullable=True)
 
     stock: Mapped["Stock"] = relationship("Stock", back_populates="prices")
+
+    def __repr__(self):
+        return f"<StockPrice stock_id={self.stock_id}, date={self.date}, close={self.close_price}>"
