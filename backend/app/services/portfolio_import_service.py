@@ -1,9 +1,9 @@
 
 import pandas as pd
-from typing import IO, Any
+from typing import IO
 import app.crud.position_crud
-import app.crud.stock_crud
 from app.schemas.positio import PositionCreate
+from app.crud.stock_crud import StockCrud
 
 
 
@@ -22,7 +22,8 @@ def parse_csv(file: IO[str], portfolio_id: int, db):
         
 
 def normalize_position(isin:str, quantity: int, buy_price: int, db, portfolio_id):
-    stock = app.crud.stock_crud.get_stock_by_isin(db, isin)
+    crud = StockCrud(db)
+    stock = crud.get_stock_by_isin(isin)
     if not stock:
         print('stock not found with that isin')
         return None

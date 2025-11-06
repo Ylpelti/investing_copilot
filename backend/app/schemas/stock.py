@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
-class StockCreate(BaseModel):
+class StockBase(BaseModel):
     ticker: str
     isin: Optional[str] = None
     name: Optional[str] = None
@@ -10,18 +10,17 @@ class StockCreate(BaseModel):
     sector: Optional[str] = None
     updated_at: Optional[datetime] = None
 
-class StockRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class StockCreate(StockBase):
+    pass
+    
+
+class StockRead(StockBase):
     id: int
-    ticker: str
-    name: Optional[str] = None
-    isin: Optional[str] = None
-    close_price: float
-    sector: Optional[str] = None
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        orm_mode = True
-
+    
+    
 
 
 
