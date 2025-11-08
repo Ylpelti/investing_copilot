@@ -1,7 +1,7 @@
 
 import pandas as pd
 from typing import IO
-import app.crud.position_crud
+from app.crud.position_crud import PositionCrud
 from app.schemas.positio import PositionCreate
 from app.crud.stock_crud import StockCrud
 
@@ -9,7 +9,8 @@ from app.crud.stock_crud import StockCrud
 
 
 
-def parse_csv(file: IO[str], portfolio_id: int, db):
+def parse_csv(file: IO[str], portfolio_id: int, db, current_user_id:int):
+    crud = PositionCrud(db)
     df = pd.read_csv(file, encoding='utf-16', sep='\t', decimal=',')
     for _,row in df.iterrows():
         quantity = row['Määrä']
@@ -18,7 +19,7 @@ def parse_csv(file: IO[str], portfolio_id: int, db):
         position = normalize_position(isin, quantity, buy_price, db, portfolio_id)
         if not position:
             continue
-        app.crud.position_crud.create_position(db, position)        
+        crud.create_position(position, current_user_id)        
         
 
 def normalize_position(isin:str, quantity: int, buy_price: int, db, portfolio_id):

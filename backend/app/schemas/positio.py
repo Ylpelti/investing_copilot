@@ -1,24 +1,22 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
-class PositionCreate(BaseModel):
+class PositionBase(BaseModel):
     symbol: str
     quantity: float
     portfolio_id: int
     stock_id: int
     buy_price: Optional[float] = None
 
-class PositionRead(BaseModel):
+
+class PositionCreate(PositionBase):
+    pass
+
+class PositionRead(PositionBase):
     id: int
-    symbol: str
-    quantity: float
-    portfolio_id: int
-    stock_id: Optional[int] = None
-    buy_price: Optional[float] = None
+    
 
-    class Config:
-        orm_mode = True
 
-class PositionUpdate(BaseModel):
+class PositionUpdate(PositionBase):
     quantity: Optional[float] = None
     buy_price: Optional[float] = None

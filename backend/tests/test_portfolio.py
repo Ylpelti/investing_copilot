@@ -138,7 +138,7 @@ def test_deleting_portfolio(test_crud, test_user, test_db):
 
 
 
-def test_portfolio_import(test_db, test_portfolio, test_stock):
+def test_portfolio_import(test_db, test_portfolio, test_stock, test_user):
 
     csv_data = """Tulostuspäivä\tSalkku\tHankintapäivä\tInstrumentti\tTunnus\tISIN\tValuutta\tMäärä\tHankinta-arvo (Noteerausvaluutta)\tHankintahinta (EUR)
     7.10.2025\t19568203\t3.4.2024\tFortum\tFORTUM\tFI0009007132\tEUR\t10\t12.5\t125,0
@@ -146,7 +146,7 @@ def test_portfolio_import(test_db, test_portfolio, test_stock):
 
     fake_file = io.StringIO(csv_data)
 
-    parse_csv(fake_file, portfolio_id=test_portfolio.id, db=test_db)
+    parse_csv(fake_file, portfolio_id=test_portfolio.id, db=test_db, current_user_id=test_user.id )
 
     positions = test_db.query(Position).all()
     assert len(positions) == 1

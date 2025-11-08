@@ -50,7 +50,7 @@ def import_portfolio(
     crud = PortfolioCrud(db)
     portfolio = crud.get_owned_portfolio(portfolio_id=portfolio_id, user_id=current_user.id)
 
-    parse_csv(file, portfolio.id, db) #type: ignore
+    parse_csv(file, portfolio.id, db, current_user.id) #type: ignore
 
     return {"detail": "Import completed successfully."}
 
