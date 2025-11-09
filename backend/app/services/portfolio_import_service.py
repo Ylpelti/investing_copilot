@@ -1,38 +1,46 @@
 
 import pandas as pd
 from typing import IO
-from app.crud.position_crud import PositionCrud
-from app.schemas.positio import PositionCreate
+from app.crud.transaction_crud import TransactionCrud
+from app.schemas.transactions import TransactionCreate
 from app.crud.stock_crud import StockCrud
+from app.core.errors.exceptions import NotFound
+from datetime import datetime
+from app.models.transaction import TransactionType
+
+
 
 
 
 
 
 def parse_csv(file: IO[str], portfolio_id: int, db, current_user_id:int):
-    crud = PositionCrud(db)
+    crud = TransactionCrud(db)
     df = pd.read_csv(file, encoding='utf-16', sep='\t', decimal=',')
     for _,row in df.iterrows():
         quantity = row['Määrä']
         isin = row['ISIN']
         buy_price = row["Hankinta-arvo (Noteerausvaluutta)"]
-        position = normalize_position(isin, quantity, buy_price, db, portfolio_id)
-        if not position:
+        trade_date = pd.to_datetime(row["Hankintapäivä"], format="%d.%m.%Y", errors="coerce")
+        transaction = normalize_transaction(isin, quantity, buy_price, trade_date, db, portfolio_id)
+        if not transaction:
             continue
-        crud.create_position(position, current_user_id)        
+        crud.ceate_transaction(transaction, current_user_id)        
         
 
-def normalize_position(isin:str, quantity: int, buy_price: int, db, portfolio_id):
+def normalize_transaction(isin:str, quantity: int, buy_price: int, trade_date:datetime, db, portfolio_id):
     crud = StockCrud(db)
     stock = crud.get_stock_by_isin(isin)
     if not stock:
-        print('stock not found with that isin')
-        return None
+        raise NotFound(message="Stock not found with that isin")
+        
     
-    return PositionCreate(
-        symbol=stock.ticker,
-        quantity=quantity,
-        portfolio_id=portfolio_id,
-        stock_id=stock.id,
-        buy_price=buy_price
+    return TransactionCreate(
+         portfolio_id=portfolio_id,
+         stock_id=stock.id,
+         symbol=stock.ticker,
+         type=TransactionType.BUY,
+         quantity=quantity,
+         price=buy_price,
+         timestamp=trade_date       
     )

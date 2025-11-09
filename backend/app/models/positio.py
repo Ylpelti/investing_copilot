@@ -1,7 +1,7 @@
 
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.session import Base
+from app.db.base_class import Base
 from typing import Optional
 from datetime import datetime
 

@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.session import Base
+from app.db.base_class import Base
 from datetime import datetime
 
 
@@ -30,3 +30,4 @@ class Portfolio(Base):
         back_populates="portfolio",
         cascade="all, delete-orphan",
         lazy='selectin')
+    transactions: Mapped[list["PortfolioTransaction"]] = relationship("PortfolioTransaction", back_populates="portfolio", lazy="selectin")

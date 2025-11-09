@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.session import Base
+from app.db.base_class import Base
 from typing import Optional
 from datetime import datetime
 
@@ -14,16 +14,16 @@ class Stock(Base):
     close_price: Mapped[Optional[float]] = mapped_column(Float, nullable=False)
     sector: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
-
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now(),
         nullable=True)
     
-
     positions: Mapped[list["Position"]] = relationship("Position", back_populates="stock")
     prices: Mapped[list["StockPrice"]] = relationship("StockPrice", back_populates="stock")
+    transactions: Mapped[list["PortfolioTransaction"]] = relationship("PortfolioTransaction", back_populates="stock", lazy="noload")
+
 
     def __repr__(self):
         return f"<Stock {self.ticker} ({self.name or " "})>"
