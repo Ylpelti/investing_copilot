@@ -1,8 +1,10 @@
 import pytest
-from app import models
-from app.db.session import SessionLocal, Base, engine
-from app.security.hashing import hash_password
 from datetime import datetime, UTC
+
+from app import models
+from app.db.session import SessionLocal, engine
+from app.db.base_class import Base
+from app.security.hashing import hash_password
 from app.schemas.stock import StockCreate
 
 

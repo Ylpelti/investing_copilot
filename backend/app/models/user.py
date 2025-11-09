@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, String, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.db.session import Base
+from app.db.base_class import Base
 
 
 
@@ -16,7 +16,6 @@ class User(Base):
     #updated_at: Mapped[str] = mapped_column(DateTime(timezone=True), on_update=func.now())
 
     portfolios: Mapped[list["Portfolio"]] = relationship("Portfolio", back_populates="user")
-
 
 
 
