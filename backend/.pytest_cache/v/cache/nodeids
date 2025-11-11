@@ -1,4 +1,8 @@
 [
+  "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/badrequest-400-BadRequest]",
+  "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/forbidden-403-Forbidden]",
+  "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/notfound-404-NotFound]",
+  "tests/test_portfolio.py::TestAPIErrorHandler::test_generic_exception_fallback",
   "tests/test_portfolio.py::test_create_portfolio",
   "tests/test_portfolio.py::test_create_portfolio_without_description",
   "tests/test_portfolio.py::test_creating_portfolio_with_default_name",

@@ -13,6 +13,7 @@ from app.core.errors.exceptions import NotFound
 @pytest.fixture
 def test_crud(test_db):
     return StockCrud(test_db)
+
 class TestModelLayer:
     def test_create_stock(self, test_crud, fake_stock_data):
         result = test_crud.create_stock(fake_stock_data)
@@ -247,7 +248,9 @@ class TestStockCrud:
         result = test_crud.create_stock(valid_stock)
         assert result.ticker == "NEWTEST.HE"
 
-#class TestApiLayer:
+class TestApiLayer:
+
+    
     def test_create_stock_returns_201(self, client, test_db):
         """✔ POST /stocks creates stock and returns 201 status."""
         payload = {

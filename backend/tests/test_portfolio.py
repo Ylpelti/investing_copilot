@@ -8,6 +8,8 @@ from app.crud.portfolio_crud import PortfolioCrud
 from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
 from app.schemas.user import UserCreate
 from app.models import User, Portfolio
+from fastapi.testclient import TestClient
+from app.main import app
 
 
 
@@ -121,23 +123,6 @@ def test_deleting_portfolio(test_crud, test_user, test_db):
 
 
 
-
-    
-
-
-
-    
-
-
-
-    
-
-
-
-
-
-
-
 def test_portfolio_import(test_db, test_portfolio, test_stock, test_user):
 
     csv_data = """Tulostuspäivä\tSalkku\tHankintapäivä\tInstrumentti\tTunnus\tISIN\tValuutta\tMäärä\tHankinta-arvo (Noteerausvaluutta)\tHankintahinta (EUR)
@@ -153,6 +138,67 @@ def test_portfolio_import(test_db, test_portfolio, test_stock, test_user):
     assert positions[0].quantity == 10
     assert positions[0].buy_price == 12.5
     assert len(positions) != 2
+
+
+
+# --- temporary routes for testing error handler ---
+@app.get("/test/notfound")
+async def _raise_notfound():
+    from app.core.errors.exceptions import NotFound
+    raise NotFound(message="Portfolio not found")
+
+@app.get("/test/forbidden")
+async def _raise_forbidden():
+    from app.core.errors.exceptions import Forbidden
+    raise Forbidden(message="Access denied")
+
+@app.get("/test/badrequest")
+async def _raise_badrequest():
+    from app.core.errors.exceptions import BadRequest
+    raise BadRequest(message="Bad data provided")
+
+@app.get("/test/unexpected")
+async def _raise_unexpected():
+    raise ValueError("Something broke internally")
+
+
+client = TestClient(app, raise_server_exceptions=False)
+
+
+class TestAPIErrorHandler:
+    """Ensure global error handlers produce consistent JSON responses."""
+
+    @pytest.mark.parametrize(
+        "endpoint, expected_status, expected_error",
+        [
+            ("/test/notfound", 404, "NotFound"),
+            ("/test/forbidden", 403, "Forbidden"),
+            ("/test/badrequest", 400, "BadRequest"),
+        ],
+    )
+    def test_app_error_json_responses(self, endpoint, expected_status, expected_error):
+        """AppError subclasses should yield clean JSON responses."""
+        res = client.get(endpoint)
+        body = res.json()
+
+        assert res.status_code == expected_status
+        assert body["error"] == expected_error
+        assert "message" in body
+        assert body["status_code"] == expected_status
+
+    def test_generic_exception_fallback(self):
+        """Unhandled exceptions should return 500 and consistent structure."""
+        print("Registered handlers:", app.exception_handlers.keys())
+
+        res = client.get("/test/unexpected")
+        body = res.json()
+        
+
+        assert res.status_code == 500
+        assert body["error"] == "InternalServerError"
+        assert "message" in body
+        assert "broke internally" in body["message"].lower()
+
 
 
 

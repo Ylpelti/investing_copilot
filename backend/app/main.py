@@ -7,9 +7,16 @@ from app.services.stock_price_service import fetch_and_store_stock_price
 from app.tasks.portfolio_analysis import calculate_portfolio_value, stock_returns
 from app.tasks.portfolio_analyysi import load_prices_df, get_positions_map, portfolio_value_series, build_dashboard_from_series
 from datetime import date
+from app.core.errors.errorhandler import app_error_handler, generic_exception_handler
+from app.core.errors.exceptions import AppError
+from typing import cast
+
 
 
 app = FastAPI()
+
+app.add_exception_handler(AppError, app_error_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,7 +25,9 @@ app.include_router(positio.router)
 app.include_router(users.router)
 app.include_router(portfolio.router)
 app.include_router(stocks_price.router)
-app.include_router(token.router)        
+app.include_router(token.router)   
+
+
 
 @app.on_event("startup")
 def startup_event():

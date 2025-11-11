@@ -9,7 +9,7 @@ router = APIRouter(
     tags=["stocks"],
 )   
 
-@router.post("/", response_model=StockRead)
+@router.post("/", response_model=StockRead, status_code=201)
 def create_stock(stock: StockCreate, db: Session = Depends(get_db)):
     crud = StockCrud(db)
     return crud.create_stock(stock)

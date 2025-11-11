@@ -123,7 +123,7 @@ def load_prices_df(
     if reindex_business_days:
         all_days = pd.date_range(start=df.index.min(), end=df.index.max(), freq="B")
         df = df.reindex(all_days)
-        df.index = df.index.date
+        df.index = df.index.date #type: ignore
 
     if forward_fill:
         df = df.ffill()
