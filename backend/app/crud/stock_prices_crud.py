@@ -47,3 +47,23 @@ class StockPriceCrud(BaseCrud):
         if not prices:
             raise NotFound(message=f"No prices found for stock_id={stock_id} in given date range")
         return prices
+    
+    def read_prices_bu_stock_ids_and_date(self, stock_ids: list[int], start_date:date, end_date: date):
+
+        q = (
+            self.db.query(StockPrice)
+            .filter(StockPrice.stock_id.in_(stock_ids))
+            .order_by(StockPrice.date.asc())
+        )
+
+        if start_date:
+            q = q.filter(StockPrice.date >= start_date)
+        if end_date:
+            q = q.filter(StockPrice.date <= end_date)
+
+        result = q.all()
+
+        if not result:
+            raise NotFound(message=f"Didn't find any stocks with ids {stock_ids}")
+        
+        return result

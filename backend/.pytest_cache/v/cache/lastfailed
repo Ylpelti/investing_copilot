@@ -13,5 +13,8 @@
   "tests/test_position.py::TestPositionCrud::test_create_position_success": true,
   "tests/test_position.py::TestPositionCrud::test_create_position_duplicate_symbol": true,
   "tests/test_position.py::TestPositionCrud::test_delete_position_success": true,
-  "tests/test_position.py::TestPositionCrud::test_delete_position_forbidden": true
+  "tests/test_position.py::TestPositionCrud::test_delete_position_forbidden": true,
+  "tests/test_analytics.py::TestPricesToDf::test_empty_returns_empty_df": true,
+  "tests/test_analytics.py::TestPricesToDf::test_builds_correct_dataframe": true,
+  "tests/test_analytics.py::test_inspect_pipeline": true
 }

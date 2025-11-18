@@ -1,4 +1,9 @@
 [
+  "tests/test_analytics.py::TestPricesToDf::test_builds_correct_dataframe",
+  "tests/test_analytics.py::TestPricesToDf::test_empty_returns_empty_df",
+  "tests/test_analytics.py::TestTransactionToDf::test_basic_conversion_and_sorting",
+  "tests/test_analytics.py::TestTransactionToDf::test_empty_list_returns_empty_df",
+  "tests/test_analytics.py::test_inspect_pipeline",
   "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/badrequest-400-BadRequest]",
   "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/forbidden-403-Forbidden]",
   "tests/test_portfolio.py::TestAPIErrorHandler::test_app_error_json_responses[/test/notfound-404-NotFound]",
