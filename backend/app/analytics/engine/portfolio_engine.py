@@ -8,6 +8,8 @@ from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility,
 from app.analytics.utils.series_to_records import series_to_records
 import matplotlib.pyplot as plt
 from app.analytics.models.performance import sharpe_ratio
+from app.analytics.models.performance_returns import performance_returns
+from app.analytics.data.casf_flow import casf_flow
 
 class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
 
@@ -15,18 +17,23 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns = self.build_core_series(tx, db)
+        tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, cf = self.build_core_series(tx, db)
         
-        risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
+        #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
+
+        return tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, cf
 
         
     def build_core_series(self, tx, db):
         tx_df = self.load_tx_df(tx)
         prices_df = self.load_prices_df(db, tx)
         holdings_df = self.compute_holdings_df(tx_df, prices_df)
-        portfolio_value_series = self.compute_portfolio_value_series(holdings_df, prices_df)
+        cf = casf_flow(tx_df, prices_df.index)
+        portfolio_value_series = self.compute_portfolio_value_series(holdings_df, prices_df, cf)
         portfolio_returns = self.compute_portfolio_returns(portfolio_value_series)
-        return tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns
+        performance_returns = self.compute_performance_returns(portfolio_value_series, tx_df, prices_df.index)
+        
+        return tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, cf
 
 
     def load_tx_df(self, txs):
@@ -38,11 +45,15 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     def compute_holdings_df(self, tx_df, prices_df):
         return build_holdings_df(tx_df, prices_df)
     
-    def compute_portfolio_value_series(self, holdings_df, prices_df):
-        return build_portfolio_value_series(holdings_df, prices_df)
+    def compute_portfolio_value_series(self, holdings_df, prices_df, cf):
+        return build_portfolio_value_series(holdings_df, prices_df, cf)
     
     def compute_portfolio_returns(self, portfolio_value_series):
         return simple_returns(portfolio_value_series)
+    
+    def compute_performance_returns(self, portfolio_value_series, tx_df, prices_index):
+        cf = casf_flow(tx_df, prices_index)
+        return performance_returns(portfolio_value_series, cf)
     
     def compute_risk_metrics(self, value_series, returns):
         periods = self.config.periods_per_year
@@ -56,3 +67,109 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
             "sharpe ratio" : sharpe_ratio(returns, rf_daily, periods)
         }
     
+if __name__ == "__main__":
+    from app.db.session import SessionLocal
+    from datetime import datetime
+    from types import SimpleNamespace
+    import matplotlib.pyplot as plt
+    from app.analytics.engine.config import EngineConfig
+
+    db = SessionLocal()
+    config = EngineConfig()
+
+    txs = [
+
+    # ---- INITIAL INVESTMENT (~ €9,000) ----
+    SimpleNamespace(stock_id=1, timestamp=datetime(2024, 8, 1), quantity=500, price=3.50, type="BUY"),      # €1750
+    SimpleNamespace(stock_id=2, timestamp=datetime(2024, 8, 1), quantity=150, price=19.00, type="BUY"),     # €2850
+    SimpleNamespace(stock_id=3, timestamp=datetime(2024, 8, 1), quantity=80,  price=17.00, type="BUY"),     # €1360
+    # Total initial exposure: ~ €5960
+
+    # ---- FOLLOW-UP BUYS (~ €3,000) ----
+    SimpleNamespace(stock_id=1, timestamp=datetime(2024, 9, 5), quantity=200, price=3.60, type="BUY"),      # €720
+    SimpleNamespace(stock_id=3, timestamp=datetime(2024, 9, 20), quantity=60,  price=17.20, type="BUY"),    # €1032
+    SimpleNamespace(stock_id=2, timestamp=datetime(2024, 10, 10), quantity=70, price=19.30, type="BUY"),    # €1351
+    # Running total exposure: ~ €9,000
+
+    # ---- MID-YEAR REBALANCING / PROFIT TAKING ----
+    SimpleNamespace(stock_id=3, timestamp=datetime(2024, 12, 15), quantity=40, price=18.00, type="SELL"),   # €720
+    SimpleNamespace(stock_id=1, timestamp=datetime(2025, 1, 20), quantity=150, price=4.10, type="SELL"),    # €615
+    # Portfolio stays healthy; cash gets reduced negativity
+
+    # ---- NEW CONTRIBUTION (~ €2k invested gradually) ----
+    SimpleNamespace(stock_id=2, timestamp=datetime(2025, 2, 10), quantity=50, price=19.20, type="BUY"),     # €960
+    SimpleNamespace(stock_id=1, timestamp=datetime(2025, 2, 25), quantity=120, price=4.30, type="BUY"),     # €516
+    SimpleNamespace(stock_id=3, timestamp=datetime(2025, 3, 5),  quantity=30, price=17.50, type="BUY"),     # €525
+
+    # ---- LIGHT TRIMMING (taking profits or reducing exposure) ----
+    SimpleNamespace(stock_id=3, timestamp=datetime(2025, 4, 12), quantity=30, price=18.20, type="SELL"),     # €546
+    SimpleNamespace(stock_id=2, timestamp=datetime(2025, 4, 25), quantity=40, price=19.95, type="SELL"),     # €798
+
+    # ---- FINAL SMALL ADJUSTMENT ----
+    SimpleNamespace(stock_id=1, timestamp=datetime(2025, 5, 10), quantity=80, price=4.40, type="BUY"),       # €352
+]
+
+
+
+    engine = PortfolioAnalyticsEngine(config)
+
+    # --- RUN ANALYTICS ---
+    tx_df, prices_df, holdings_df, V,  port_returns, perf_returns, cf = engine.compute(txs, db)
+
+    print("\n=== Transactions df ===")
+    print(tx_df)
+
+    print("POrtfolio series \n")
+    print(V)
+
+    print("\n=== prices df ===")
+    print(prices_df)
+
+    print("\n=== Holdings df ===")
+    print(holdings_df)
+
+
+    print("\n=== SIMPLE RETURNS ===")
+    print(port_returns)
+
+    #print("\n=== PERFORMANCE RETURNS (CF-adjusted) ===")
+    #print(perf_returns)
+
+    print("\n=== CF ===")
+    print(cf)
+
+    from app.analytics.data.twrr import build_twrr_series
+
+    build_twrr_series(tx_df, V)
+
+    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf = engine.build_core_series(txs, db)
+
+    
+
+    fig, axs = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
+
+    # 1. Portfolio Value Over Time
+    axs[0].plot(pv_series.index, pv_series, label="Portfolio Value", color="blue")
+    axs[0].set_title("Portfolio Value Over Time")
+    axs[0].set_ylabel("Value (€)")
+    axs[0].grid(True, alpha=0.3)
+    axs[0].legend()
+
+    # 2. Simple Daily Returns
+    axs[1].plot(simple_ret.index, simple_ret, label="Simple Daily Returns", color="green")
+    axs[1].axhline(0, color="black", linewidth=0.8)
+    axs[1].set_title("Daily Returns")
+    axs[1].set_ylabel("Return (%)")
+    axs[1].grid(True, alpha=0.3)
+    axs[1].legend()
+
+    # 3. Cash-Flow Adjusted Performance Returns
+    axs[2].plot(perf_ret.index, perf_ret, label="CF-Adjusted Performance Returns", color="purple")
+    axs[2].axhline(0, color="black", linewidth=0.8)
+    axs[2].set_title("Performance Returns (Cash-Flow Adjusted)")
+    axs[2].set_ylabel("Return (%)")
+    axs[2].grid(True, alpha=0.3)
+    axs[2].legend()
+
+    plt.tight_layout()
+    plt.show()

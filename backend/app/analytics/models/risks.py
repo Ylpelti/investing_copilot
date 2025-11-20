@@ -10,8 +10,11 @@ def max_drawdown(values: pd.Series) -> float:
     dd = drawdown_curve(values)
     return float(dd.min())
 
-def volatility(returns: pd.Series, periods_per_year=252) -> float:
-    return float(returns.std() * np.sqrt(periods_per_year))
+def volatility(returns: pd.Series, periods_per_year=252, annualize: bool = True) -> float:
+    vol = returns.std()
+    if annualize:
+        vol *= np.sqrt(periods_per_year)
+    return vol
 
 def var_cvar(returns: pd.Series, level=0.95):
     alpha = 1 - level

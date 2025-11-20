@@ -1,8 +1,13 @@
 import pandas as pd
 import numpy as np
 
-def simple_returns(s: pd.Series) -> pd.Series:
-    return s.pct_change().dropna()
+def simple_returns(portfolio_value_series: pd.Series) -> pd.Series:
+    V_t = portfolio_value_series.copy()
+    V_t_1 = V_t.shift(1)
+    
+    r_raw_t = (V_t - V_t_1) / V_t_1
+    return r_raw_t.dropna()
 
-def log_returns(s: pd.Series) -> pd.Series:
-    return np.log(s / s.shift(1)).dropna()
+def log_returns(r_raw_t: pd.Series) -> pd.Series: 
+    return (1+r_raw_t).apply(np.log)
+    

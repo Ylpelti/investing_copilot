@@ -59,7 +59,7 @@ def plot_portfolio_dashboard(value_series, returns, drawdown):
     axs[2].legend()
     
     plt.tight_layout()
-    #plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
