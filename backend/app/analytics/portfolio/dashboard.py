@@ -2,7 +2,7 @@ from app.models.transaction import PortfolioTransaction
 from app.analytics.data.transaction_data import transaction_to_df
 from app.analytics.data.prices import prices_to_df
 from app.analytics.data.holdings import build_holdings_df
-from app.analytics.portfolio.portfolio_value_series import build_portfolio_value_series
+from backend.app.analytics.portfolio.NAV_r import build_portfolio_value_series
 from app.analytics.models.returns import simple_returns, log_returns
 from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility, var_cvar
 from app.analytics.utils.series_to_records import series_to_records
