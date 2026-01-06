@@ -12,3 +12,4 @@ def performance_returns(value_series: pd.Series, cf_series: pd.Series) -> pd.Ser
 def cumulative_performance_returns(r_perf: pd.Series) -> pd.Series:
     r = r_perf.fillna(0)
     R_cum = (1+r).cumprod() - 1
+    return R_cum

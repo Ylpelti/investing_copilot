@@ -6,10 +6,12 @@ def simple_returns(NAV_shifted_t: pd.Series) -> pd.Series:
     V_t_1 = V_t.shift(1)
     
     r_raw_t = (V_t - V_t_1) / V_t_1
+
+
     return r_raw_t.dropna()
 
-def cumulative_returns(NAV_shifted_t: pd.Series) -> pd.Series:
-    R_c = (NAV_shifted_t + 1).cumprod() - 1
+def cumulative_returns(simple_ret: pd.Series) -> pd.Series:
+    R_c = (simple_ret + 1).cumprod() - 1
     return R_c
 
 def log_returns(r_raw_t: pd.Series) -> pd.Series: 
