@@ -8,7 +8,7 @@ from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility,
 from app.analytics.utils.series_to_records import series_to_records
 import matplotlib.pyplot as plt
 from app.analytics.models.performance import sharpe_ratio
-from app.analytics.models.performance_returns import performance_returns
+
 from app.analytics.data.market_value import market_value
 
 from app.analytics.data.cash_flow_internal import build_C_t
@@ -19,11 +19,11 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
+        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
         
         #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
 
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, 
 
         
     def build_core_series(self, tx, db):
@@ -34,11 +34,11 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         MV = self.compute_market_value(holdings_df, prices_df)
         NAV_r= self.compute_NAV_r(MV, internal_cash)
         portfolio_returns = self.compute_portfolio_returns(NAV_r, external_cf)
-        performance_returns = self.compute_performance_returns(NAV_r, external_cf)
+        
         R_c = self.compute_cumulative_returns(portfolio_returns)
         
         
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, R_c, internal_cash, external_cf
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, R_c, internal_cash, external_cf
     
     def build_return_series(self, tx_db, txs):
         pass
@@ -61,10 +61,6 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     
     def compute_cumulative_returns(self, returns):
         return cumulative_returns(returns)
-    
-    def compute_performance_returns(self, NAV_r, external_cf):
-        
-        return performance_returns(NAV_r, external_cf)
     
     def compute_market_value(self, holdings_df, prices_df):
         return market_value(holdings_df, prices_df)
@@ -131,7 +127,7 @@ if __name__ == "__main__":
     engine = PortfolioAnalyticsEngine(config)
 
     # --- RUN ANALYTICS ---
-    tx_df, prices_df, holdings_df, NAV_r,  port_returns, perf_returns = engine.compute(txs, db)
+    tx_df, prices_df, holdings_df, NAV_r,  port_returns = engine.compute(txs, db)
 
     print("\n=== Transactions df ===")
     print(tx_df)
@@ -153,12 +149,7 @@ if __name__ == "__main__":
     #print(perf_returns)
 
 
-
-    from app.analytics.data.twrr import build_twrr_series
-
-    build_twrr_series(tx_df, NAV_r)
-
-    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
+    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
 
     
 
