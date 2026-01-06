@@ -1,7 +1,7 @@
 import pandas as pd
 
-def build_C_t(tx_df:pd.DataFrame, prices_df:pd.DataFrame) -> tuple[pd.Series, pd.Series]:
-    s = pd.Series()
+def build_cf_series(tx_df:pd.DataFrame, prices_df:pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+    
     
         
     df = tx_df.copy()

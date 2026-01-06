@@ -3,7 +3,7 @@ from app.analytics.data.transaction_data import transaction_to_df
 from app.analytics.data.prices import prices_to_df
 from app.analytics.data.holdings import build_holdings_df
 from app.analytics.portfolio.NAV_r import build_NAV_r
-from app.analytics.models.returns import simple_returns, cumulative_returns
+from app.analytics.models.returns import simple_returns, cumulative_returns, log_returns
 from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility, var_cvar
 from app.analytics.utils.series_to_records import series_to_records
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from app.analytics.models.performance import sharpe_ratio
 
 from app.analytics.data.market_value import market_value
 
-from app.analytics.data.cash_flow_internal import build_C_t
+from app.analytics.data.cash_flow_internal import build_cf_series
 
 class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
 
@@ -19,29 +19,53 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
-        
-        #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
+        tx_df, prices_df, holdings_df, NAV_r, simple_returns, cum_returns, log_returns, internal_cash, external_cash = self.build_core_series(tx, db)
+        risk = self.compute_risk_metrics(NAV_r, simple_returns)
 
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, 
+        return {
+            "data": {
+                "transaction dataframe": tx_df,
+                "prices df": prices_df,
+                "holdings df": holdings_df,
+                "NAV": NAV_r
+            },
 
-        
+            "returns": {
+                "simple return": simple_returns,
+                "cumulative returns": cum_returns,
+                "log returns": log_returns
+
+            }, 
+            "risk": risk
+        }
+
     def build_core_series(self, tx, db):
         tx_df = self.load_tx_df(tx)
         prices_df = self.load_prices_df(db, tx)
         holdings_df = self.compute_holdings_df(tx_df, prices_df)
-        internal_cash, external_cf = self.compute_C_internal(tx_df, prices_df)
+        internal_cash, external_cf = self.compute_Cashflows(tx_df, prices_df)
         MV = self.compute_market_value(holdings_df, prices_df)
         NAV_r= self.compute_NAV_r(MV, internal_cash)
-        portfolio_returns = self.compute_portfolio_returns(NAV_r, external_cf)
+        simple_returns = self.compute_portfolio_returns(NAV_r, external_cf)
+        cum_returns = self.compute_cumulative_returns(simple_returns)
+        log_returns = self.compute_log_returns(simple_returns)
         
-        R_c = self.compute_cumulative_returns(portfolio_returns)
         
         
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, R_c, internal_cash, external_cf
+        return tx_df, prices_df, holdings_df, NAV_r, simple_returns, cum_returns, log_returns, internal_cash, external_cf
     
-    def build_return_series(self, tx_db, txs):
-        pass
+    def compute_risk_metrics(self, NAV_r, returns):
+        periods = self.config.periods_per_year
+        rf_daily = (1-self.config.rf_annual)**(1/periods)-1
+       
+        return {
+            "drawdown curve": drawdown_curve(NAV_r),
+            "max drawdown": max_drawdown(NAV_r),
+            "volatility": volatility(returns, periods_per_year=periods),
+            "var cvar" : var_cvar(returns),
+            "sharpe ratio" : sharpe_ratio(returns, rf_daily, periods)
+        }
+
 
 
     def load_tx_df(self, txs):
@@ -59,26 +83,19 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     def compute_portfolio_returns(self, Nav_r, external_cash):
         return simple_returns(Nav_r, external_cash)
     
-    def compute_cumulative_returns(self, returns):
-        return cumulative_returns(returns)
+    def compute_cumulative_returns(self, simple_returns):
+        return cumulative_returns(simple_returns)
+    
+    def compute_log_returns(self, simple_returns):
+        return log_returns(simple_returns)
     
     def compute_market_value(self, holdings_df, prices_df):
         return market_value(holdings_df, prices_df)
     
-    def compute_C_internal(self, tx_df, prices_df):
-        return build_C_t(tx_df, prices_df)
+    def compute_Cashflows(self, tx_df, prices_df):
+        return build_cf_series(tx_df, prices_df)
     
-    def compute_risk_metrics(self, value_series, returns):
-        periods = self.config.periods_per_year
-        rf_daily = (1-self.config.rf_annual)**(1/periods)-1
-       
-        return {
-            "drawdown curve": drawdown_curve(value_series),
-            "max drawdown": max_drawdown(value_series),
-            "volatility": volatility(returns, periods_per_year=periods),
-            "var cvar" : var_cvar(returns),
-            "sharpe ratio" : sharpe_ratio(returns, rf_daily, periods)
-        }
+    
     
 if __name__ == "__main__":
     from app.db.session import SessionLocal
@@ -127,33 +144,19 @@ if __name__ == "__main__":
     engine = PortfolioAnalyticsEngine(config)
 
     # --- RUN ANALYTICS ---
-    tx_df, prices_df, holdings_df, NAV_r,  port_returns = engine.compute(txs, db)
-
-    print("\n=== Transactions df ===")
-    print(tx_df)
-
-    print("POrtfolio series \n")
-    print(NAV_r.to_string())
-
-    print("\n=== prices df ===")
-    print(prices_df)
-
-    print("\n=== Holdings df ===")
-    print(holdings_df)
+    
 
 
-    print("\n=== SIMPLE RETURNS ===")
-    print(port_returns)
 
-    #print("\n=== PERFORMANCE RETURNS (CF-adjusted) ===")
-    #print(perf_returns)
-
-
-    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
+    tx_df2, prices_df2, holdings_df2, NAV_r, simple_ret,  cum_returns, log_return, internal_cash, external_cash = engine.build_core_series(txs, db)
 
     
 
     fig, axs = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
+
+
+    
+    print(engine.compute(txs, db))
 
     # 1. Portfolio Value Over Time
     axs[0].plot(NAV_r.index, NAV_r, label="NAV", color="blue")
