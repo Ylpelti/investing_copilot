@@ -12,6 +12,7 @@ from app.analytics.models.performance_returns import performance_returns
 from app.analytics.data.casf_flow import casf_flow
 from app.analytics.data.market_value import market_value
 from app.analytics.portfolio.NAV_shifted_t import build_NAV_shifted_t
+from app.analytics.data.cash_flow_internal import build_C_t
 
 class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
 
@@ -19,7 +20,7 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, c_t, NAV_shifted_r, R_c = self.build_core_series(tx, db)
+        tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, c_t, NAV_shifted_r, R_c, C_internal_t = self.build_core_series(tx, db)
         
         #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
 
@@ -37,8 +38,9 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         portfolio_returns = self.compute_portfolio_returns(NAV_shifted_t)
         performance_returns = self.compute_performance_returns(NAV_r, tx_df, prices_df.index)
         R_c = self.compute_cumulative_returns(portfolio_returns)
+        C_internal_t = self.compute_C_internal(tx_df, prices_df)
         
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_t, R_c
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_t, R_c, C_internal_t
     
     def build_return_series(self, tx_db, txs):
         pass
@@ -74,6 +76,9 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     
     def compute_NAV_shifted_t(self, MV, NAV_r):
         return build_NAV_shifted_t(MV, NAV_r)
+    
+    def compute_C_internal(self, tx_df, prices_df):
+        return build_C_t(tx_df, prices_df)
     
     def compute_risk_metrics(self, value_series, returns):
         periods = self.config.periods_per_year
@@ -162,7 +167,7 @@ if __name__ == "__main__":
 
     build_twrr_series(tx_df, V)
 
-    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf, NAV_shifted_t, R_c = engine.build_core_series(txs, db)
+    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf, NAV_shifted_t, R_c, C_internal_t = engine.build_core_series(txs, db)
 
     
 
