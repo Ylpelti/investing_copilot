@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
 
-def simple_returns(NAV_shifted_t: pd.Series) -> pd.Series:
-    V_t = NAV_shifted_t.copy()
+def simple_returns(NAV_r: pd.Series, external_cash:pd.Series) -> pd.Series:
+    V_t = NAV_r.copy()
     V_t_1 = V_t.shift(1)
     
-    r_raw_t = (V_t - V_t_1) / V_t_1
+    r_raw_t = (V_t - V_t_1-external_cash) / V_t_1
 
 
     return r_raw_t.dropna()

@@ -1,6 +1,6 @@
 import pandas as pd
 
-def build_C_t(tx_df:pd.DataFrame, prices_df:pd.DataFrame) -> pd.Series:
+def build_C_t(tx_df:pd.DataFrame, prices_df:pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     s = pd.Series()
     
         
@@ -21,19 +21,9 @@ def build_C_t(tx_df:pd.DataFrame, prices_df:pd.DataFrame) -> pd.Series:
     internal_cash = pd.Series(internal_cash, index=full_dates)
     external_cf = pd.Series(external_cf, index=full_dates)
 
-    print("-" * 12)
-    print("daily trade cash")
-    print(internal_cash_raw)
-
-    print("-" * 12)
-    print("internal cash")
-    print(internal_cash)
-
-    print("-" * 12)
-    print("external cashflow")
-    print(external_cf)
     
-    return s
+    
+    return internal_cash, external_cf
 
 def build_internal_and_external_flows(daily_trade_cash:pd.Series):
     internal_cash = []

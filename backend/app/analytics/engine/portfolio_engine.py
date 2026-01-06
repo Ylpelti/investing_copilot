@@ -20,11 +20,11 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, c_t, NAV_shifted_r, R_c, C_internal_t = self.build_core_series(tx, db)
+        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_r, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
         
         #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
 
-        return tx_df, prices_df, holdings_df, portfolio_value_series, portfolio_returns, performance_returns, c_t, NAV_shifted_r
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_r
 
         
     def build_core_series(self, tx, db):
@@ -32,15 +32,16 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         prices_df = self.load_prices_df(db, tx)
         holdings_df = self.compute_holdings_df(tx_df, prices_df)
         c_t = self.compute_cash_t(tx_df, prices_df.index)
+        internal_cash, external_cf = self.compute_C_internal(tx_df, prices_df)
         MV = self.compute_market_value(holdings_df, prices_df)
-        NAV_r= self.compute_NAV_r(MV, c_t)
+        NAV_r= self.compute_NAV_r(MV, internal_cash)
         NAV_shifted_t = self.compute_NAV_shifted_t(MV, NAV_r)
-        portfolio_returns = self.compute_portfolio_returns(NAV_shifted_t)
+        portfolio_returns = self.compute_portfolio_returns(NAV_r, external_cf)
         performance_returns = self.compute_performance_returns(NAV_r, tx_df, prices_df.index)
         R_c = self.compute_cumulative_returns(portfolio_returns)
-        C_internal_t = self.compute_C_internal(tx_df, prices_df)
         
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_t, R_c, C_internal_t
+        
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_t, R_c, internal_cash, external_cf
     
     def build_return_series(self, tx_db, txs):
         pass
@@ -55,11 +56,11 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     def compute_holdings_df(self, tx_df, prices_df):
         return build_holdings_df(tx_df, prices_df)
     
-    def compute_NAV_r(self, MV, c_t):
-        return build_NAV_r(MV, c_t)
+    def compute_NAV_r(self, MV, internal_cash):
+        return build_NAV_r(MV, internal_cash)
     
-    def compute_portfolio_returns(self, Nav_shifted):
-        return simple_returns(Nav_shifted)
+    def compute_portfolio_returns(self, Nav_r, external_cash):
+        return simple_returns(Nav_r, external_cash)
     
     def compute_cumulative_returns(self, returns):
         return cumulative_returns(returns)
@@ -139,13 +140,13 @@ if __name__ == "__main__":
     engine = PortfolioAnalyticsEngine(config)
 
     # --- RUN ANALYTICS ---
-    tx_df, prices_df, holdings_df, V,  port_returns, perf_returns, c_t, NAV_shifted_t = engine.compute(txs, db)
+    tx_df, prices_df, holdings_df, NAV_r,  port_returns, perf_returns, c_t, NAV_shifted_t = engine.compute(txs, db)
 
     print("\n=== Transactions df ===")
     print(tx_df)
 
     print("POrtfolio series \n")
-    print(V)
+    print(NAV_r.to_string())
 
     print("\n=== prices df ===")
     print(prices_df)
@@ -165,18 +166,18 @@ if __name__ == "__main__":
 
     from app.analytics.data.twrr import build_twrr_series
 
-    build_twrr_series(tx_df, V)
+    build_twrr_series(tx_df, NAV_r)
 
-    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf, NAV_shifted_t, R_c, C_internal_t = engine.build_core_series(txs, db)
+    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf, NAV_shifted_t, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
 
     
 
     fig, axs = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
 
     # 1. Portfolio Value Over Time
-    axs[0].plot(R_c.index, R_c, label="Cumulative returns", color="blue")
-    axs[0].set_title("Cumulative returns")
-    axs[0].set_ylabel("Return (%)")
+    axs[0].plot(NAV_r.index, NAV_r, label="NAV", color="blue")
+    axs[0].set_title("NAV")
+    axs[0].set_ylabel("Value")
     axs[0].grid(True, alpha=0.3)
     axs[0].legend()
 
