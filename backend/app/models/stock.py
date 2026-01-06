@@ -3,6 +3,12 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
 from typing import Optional
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.positio import Position
+    from app.models.stock_price import StockPrice
+    from app.models.transaction import PortfolioTransaction
 
 class Stock(Base):
     __tablename__ = "stocks"

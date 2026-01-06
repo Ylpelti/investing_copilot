@@ -3,6 +3,11 @@ from sqlalchemy import Enum, Integer, Float, String, ForeignKey, DateTime, func,
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from app.db.base_class import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.portfolio import Portfolio
+    from app.models.stock import Stock
 
 class TransactionType(str, PyEnum):
     BUY = "BUY"

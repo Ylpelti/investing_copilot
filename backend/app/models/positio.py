@@ -1,9 +1,13 @@
-
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
 from typing import Optional
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.portfolio import Portfolio
+    from app.models.stock import Stock
 
 class Position(Base):
     __tablename__ = "positions"

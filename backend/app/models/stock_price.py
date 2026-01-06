@@ -1,7 +1,11 @@
 from sqlalchemy import Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
-from datetime import date
+from datetime import date as DateType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.stock import Stock
 
 
 class StockPrice(Base):
@@ -9,7 +13,7 @@ class StockPrice(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     stock_id: Mapped[int] = mapped_column(ForeignKey("stocks.id"), nullable=False)
-    date: Mapped[date] = mapped_column(Date, nullable=False)
+    date: Mapped[DateType] = mapped_column(Date, nullable=False)
     open_price: Mapped[float] = mapped_column(Float, nullable=True)
     high_price: Mapped[float] = mapped_column(Float, nullable=True)
     low_price: Mapped[float] = mapped_column(Float, nullable=True)

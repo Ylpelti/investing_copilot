@@ -1,6 +1,9 @@
 from sqlalchemy import Integer, String, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from app.models.portfolio import Portfolio
 
 
 

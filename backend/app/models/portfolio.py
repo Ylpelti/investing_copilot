@@ -2,6 +2,12 @@ from sqlalchemy import Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
+    from app.models.positio import Position
+    from app.models.transaction import PortfolioTransaction
 
 
 class Portfolio(Base):
