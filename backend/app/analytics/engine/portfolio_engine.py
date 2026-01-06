@@ -9,9 +9,8 @@ from app.analytics.utils.series_to_records import series_to_records
 import matplotlib.pyplot as plt
 from app.analytics.models.performance import sharpe_ratio
 from app.analytics.models.performance_returns import performance_returns
-from app.analytics.data.casf_flow import casf_flow
 from app.analytics.data.market_value import market_value
-from app.analytics.portfolio.NAV_shifted_t import build_NAV_shifted_t
+
 from app.analytics.data.cash_flow_internal import build_C_t
 
 class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
@@ -20,28 +19,26 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         super().__init__(config)
 
     def compute(self, tx, db):
-        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_r, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
+        tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, R_c, internal_cash, external_cash = self.build_core_series(tx, db)
         
         #risk = self.compute_risk_metrics(portfolio_value_series, portfolio_returns)
 
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_r
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns
 
         
     def build_core_series(self, tx, db):
         tx_df = self.load_tx_df(tx)
         prices_df = self.load_prices_df(db, tx)
         holdings_df = self.compute_holdings_df(tx_df, prices_df)
-        c_t = self.compute_cash_t(tx_df, prices_df.index)
         internal_cash, external_cf = self.compute_C_internal(tx_df, prices_df)
         MV = self.compute_market_value(holdings_df, prices_df)
         NAV_r= self.compute_NAV_r(MV, internal_cash)
-        NAV_shifted_t = self.compute_NAV_shifted_t(MV, NAV_r)
         portfolio_returns = self.compute_portfolio_returns(NAV_r, external_cf)
-        performance_returns = self.compute_performance_returns(NAV_r, tx_df, prices_df.index)
+        performance_returns = self.compute_performance_returns(NAV_r, external_cf)
         R_c = self.compute_cumulative_returns(portfolio_returns)
         
         
-        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, c_t, NAV_shifted_t, R_c, internal_cash, external_cf
+        return tx_df, prices_df, holdings_df, NAV_r, portfolio_returns, performance_returns, R_c, internal_cash, external_cf
     
     def build_return_series(self, tx_db, txs):
         pass
@@ -65,18 +62,12 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     def compute_cumulative_returns(self, returns):
         return cumulative_returns(returns)
     
-    def compute_performance_returns(self, portfolio_value_series, tx_df, prices_index):
-        cf = casf_flow(tx_df, prices_index)
-        return performance_returns(portfolio_value_series, cf)
+    def compute_performance_returns(self, NAV_r, external_cf):
+        
+        return performance_returns(NAV_r, external_cf)
     
     def compute_market_value(self, holdings_df, prices_df):
         return market_value(holdings_df, prices_df)
-    
-    def compute_cash_t(self, tx_df, prices_df_index):
-        return casf_flow(tx_df, prices_df_index)
-    
-    def compute_NAV_shifted_t(self, MV, NAV_r):
-        return build_NAV_shifted_t(MV, NAV_r)
     
     def compute_C_internal(self, tx_df, prices_df):
         return build_C_t(tx_df, prices_df)
@@ -140,7 +131,7 @@ if __name__ == "__main__":
     engine = PortfolioAnalyticsEngine(config)
 
     # --- RUN ANALYTICS ---
-    tx_df, prices_df, holdings_df, NAV_r,  port_returns, perf_returns, c_t, NAV_shifted_t = engine.compute(txs, db)
+    tx_df, prices_df, holdings_df, NAV_r,  port_returns, perf_returns = engine.compute(txs, db)
 
     print("\n=== Transactions df ===")
     print(tx_df)
@@ -161,14 +152,13 @@ if __name__ == "__main__":
     #print("\n=== PERFORMANCE RETURNS (CF-adjusted) ===")
     #print(perf_returns)
 
-    print("\n=== c_t ===")
-    print(c_t)
+
 
     from app.analytics.data.twrr import build_twrr_series
 
     build_twrr_series(tx_df, NAV_r)
 
-    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, cf, NAV_shifted_t, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
+    tx_df2, prices_df2, holdings_df2, pv_series, simple_ret, perf_ret, R_c, internal_cash, external_cash = engine.build_core_series(txs, db)
 
     
 
@@ -190,7 +180,7 @@ if __name__ == "__main__":
     axs[1].legend()
 
     # 3. Cash-Flow Adjusted Performance Returns
-    axs[2].plot(NAV_shifted_t.index, NAV_shifted_t, label="NAV shifted", color="purple")
+    axs[2].plot(external_cash.index, external_cash, label="NAV shifted", color="purple")
     axs[2].axhline(0, color="black", linewidth=0.8)
     axs[2].set_title("Portvolio value")
     axs[2].set_ylabel("Value (€)")
