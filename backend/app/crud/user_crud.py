@@ -14,7 +14,6 @@ class UserCrud(BaseCrud[User]):
         return self.db.query(User).filter(User.username == username).first()
 
     def create_user(self, user: UserCreate) -> User:
-
         if self.get_user_by_username(user.username):
             raise UsernameDuplicateError()
         if self.get_user_by_email(user.email):
@@ -23,14 +22,11 @@ class UserCrud(BaseCrud[User]):
             username = user.username,
             email = user.email,
             pw_hash = hash_password(user.password)
-
         )
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
         return db_user
-
-
-
+    
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.db.query(User).filter(User.id == user_id).first()
