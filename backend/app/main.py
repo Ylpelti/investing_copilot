@@ -4,7 +4,6 @@ from app.api import users, portfolio, positio, stocks, stocks_price, token
 from app.db.session import SessionLocal
 from app.services.stock_service import fetch_and_store_stocks
 from app.services.stock_price_service import fetch_and_store_stock_price
-from app.tasks.portfolio_analysis import calculate_portfolio_value, stock_returns
 from app.tasks.portfolio_analyysi import load_prices_df, get_positions_map, portfolio_value_series, build_dashboard_from_series
 from datetime import date
 from app.core.errors.errorhandler import app_error_handler, generic_exception_handler

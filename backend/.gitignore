@@ -1,10 +1,19 @@
-# Created by pytest automatically.
-
+# Environment
 .env
 venv/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Testing
+.pytest_cache/
+
+# Database
+*.db
+
+# Editors / OS
 .DS_Store
 .idea/
 .vscode/
-*.db

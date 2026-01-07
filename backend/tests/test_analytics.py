@@ -140,7 +140,7 @@ def test_transaction_to_df_sorts_and_handles_empty():
         ),
     ]
 
-    df = transaction_to_df(txs)
+    df = transaction_to_df(txs) #type: ignore
 
     assert list(df["date"]) == [
         pd.Timestamp("2024-01-05"),
@@ -233,8 +233,8 @@ def test_build_cf_series_internal_and_external_cashflows():
 
     internal_cash, external_cf = build_cf_series(tx_df, prices_df)
 
-    expected_internal = pd.Series([0.0, 50.0, 50.0, 30.0], index=prices_df.index.normalize())
-    expected_external = pd.Series([100.0, 0.0, 0.0, 0.0], index=prices_df.index.normalize())
+    expected_internal = pd.Series([0.0, 50.0, 50.0, 30.0], index=prices_df.index.normalize()) #type: ignore
+    expected_external = pd.Series([100.0, 0.0, 0.0, 0.0], index=prices_df.index.normalize()) #type: ignore
 
     pd.testing.assert_series_equal(internal_cash, expected_internal)
     pd.testing.assert_series_equal(external_cf, expected_external)
