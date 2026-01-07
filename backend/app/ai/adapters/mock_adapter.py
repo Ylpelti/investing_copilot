@@ -1,17 +1,18 @@
+from typing import Dict, List
 from openai import OpenAI
+from app.ai.adapters.base_adapter import LLMAdapter
 import os
 import dotenv
 dotenv.load_dotenv()
 
-class OpenAIAdapater:
+class OpenAIAdapater(LLMAdapter ):
 
-    
-        
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    def __init__(self, client):
+        self.client = client
 
-    res = client.responses.create(
-        model="gpt-4.1-mini",
-        input="Answer y if connections working"
-    )
-
-    print(res)
+    def generate(self, message: List[Dict[str, str]]) -> str:
+        res = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=message
+        )
+        return res.choices[0].message.content

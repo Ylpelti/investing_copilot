@@ -71,7 +71,7 @@ class TestTokenAPI:
     def test_login_returns_valid_jwt_format(self, setup_user):
         """Returned access_token should be decodable JWT."""
         import jwt
-        from app.security.auth import SECRET_KEY, ALGORITHM
+        from app.core.config import settings
 
         data = {
             "username": setup_user["user"].username,
@@ -81,6 +81,7 @@ class TestTokenAPI:
         token = response.json()["access_token"]
 
         # Decode to verify structure and `sub` field
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         assert payload["sub"] == setup_user["user"].username
         assert "exp" in payload
+        assert "type" in payload
