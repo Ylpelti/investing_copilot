@@ -3,6 +3,9 @@ import pandas as pd
 
 def build_holdings_df(txs_df: pd.DataFrame, prices_df: pd.DataFrame) -> pd.DataFrame:
     tx_df = txs_df.copy()
+    if tx_df.empty:
+        return pd.DataFrame()
+
     tx_df["signed_qty"] = tx_df.apply(
         lambda x: x["quantity"] if x["type"].upper() == "BUY" else -x["quantity"], axis=1
     )

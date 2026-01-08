@@ -5,6 +5,8 @@ from typing import List
 from datetime import date
 
 def prices_to_df(db, txs: List[PortfolioTransaction], forward_fill: bool = True) -> pd.DataFrame:
+    if not txs:
+        return pd.DataFrame()
     prices = []
     crud = StockPriceCrud(db)
     stock_ids = list({tx.stock_id for tx in txs})
