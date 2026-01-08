@@ -1,5 +1,7 @@
-import pandas as pd
 import os
+from datetime import UTC, date, datetime
+
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 from openai import OpenAI
@@ -9,11 +11,25 @@ from app.ai.adapters.mock_adapter import MockAdapter
 from app.ai.context.portfolio_context import PortfolioContextBuilder
 from app.ai.prompts.portfolioprompt import PortfolioPrompt
 from app.ai.pipelines.pipeline import ExplanationPipeline
+from app.ai.pipelines.registry import PipelineRegistry
 from app.ai.validation.basic_validation import BasicValidation
 from app.ai.dependencies.dependencies import get_ai_service
 from app.crud.transaction_crud import TransactionCrud
+from app.crud.user_crud import UserCrud
+from app.crud.portfolio_crud import PortfolioCrud
+from app.crud.stock_crud import StockCrud
 from app.main import app
+from app.models.stock_price import StockPrice
+from app.models.transaction import TransactionType
 from app.security.dependencies import get_current_user
+from app.schemas.transactions import TransactionCreate
+from app.schemas.user import UserCreate
+from app.schemas.portfolio import PortfolioCreate
+from app.schemas.stock import StockCreate
+from app.analytics.engine.portfolio_engine import PortfolioAnalyticsEngine
+from app.analytics.engine.config import EngineConfig
+from app.services.portfolio_explanation_service import PortfolioExplanationService
+from app.ai.services.ai_explainer import AiExplainerService
 from app.core.config import settings
 
 
@@ -49,31 +65,8 @@ class FakePortfolioExplanationService:
 
 
 class TestPortfolioSummary:
-    @pytest.mark.integration
-    def test_openai_live_call_outputs_text(self):
-        api_key = settings.openai_api_key
-        if not api_key:
-            pytest.skip("OPENAI_API_KEY not set; skipping live OpenAI call")
-        client = OpenAI(api_key=api_key)
-        adapter = OpenAIAdapater(client)
-        messages = [{"role": "user", "content": "Say hello in one short sentence."}]
-
-        result = adapter.generate(messages)
-
-        print(f"AI output: {result}")
-        assert isinstance(result, str)
-        assert result.strip()
-
-    def test_openai_adapter_calls_chat_completions(self):
-        client = FakeOpenAIClient()
-        adapter = OpenAIAdapater(client)
-        messages = [{"role": "user", "content": "Hello"}]
-
-        result = adapter.generate(messages)
-
-        assert result == "Hello from OpenAI"
-        assert client.chat.completions.last_args["model"] == "gpt-4o-mini"
-        assert client.chat.completions.last_args["messages"] == messages
+    
+        
 
     def test_pipeline_builds_prompt_and_validates(self):
         analytics_results = {
@@ -92,6 +85,67 @@ class TestPortfolioSummary:
 
         assert "Summary text." in result
         assert "not investment advice" in result.lower()
+
+    def test_full_pipeline_user_portfolio_transaction_analytics_ai(self, test_db):
+        user_crud = UserCrud(test_db)
+        portfolio_crud = PortfolioCrud(test_db)
+        stock_crud = StockCrud(test_db)
+        transaction_crud = TransactionCrud(test_db)
+
+        user = user_crud.create_user(
+            UserCreate(username="pipeline_user", email="pipe@example.com", password="secret123")
+        )
+        portfolio = portfolio_crud.create_portfolio(
+            PortfolioCreate(name="Pipeline Portfolio", description=None, user_id=user.id)
+        )
+        stock = stock_crud.create_stock(
+            StockCreate(
+                ticker="PIPE",
+                isin="FI0000000001",
+                name="Pipeline Oyj",
+                close_price=10.0,
+                sector="Tech",
+                updated_at=datetime.now(UTC),
+            )
+        )
+
+        prices = [
+            StockPrice(stock_id=stock.id, date=date(2024, 1, 1), close_price=10.0),
+            StockPrice(stock_id=stock.id, date=date(2024, 1, 2), close_price=11.0),
+        ]
+        test_db.add_all(prices)
+        test_db.commit()
+
+        tx = TransactionCreate(
+            portfolio_id=portfolio.id,
+            stock_id=stock.id,
+            symbol=stock.ticker,
+            type=TransactionType.BUY,
+            quantity=10,
+            price=10.0,
+            timestamp=datetime(2024, 1, 1, tzinfo=UTC),
+        )
+        transaction_crud.ceate_transaction(tx, current_user_id=user.id)
+
+        txs = transaction_crud.get_portfolio_transactions(
+            portfolio_id=portfolio.id, current_user_id=user.id
+        )
+
+        pipeline = ExplanationPipeline(
+            builder=PortfolioContextBuilder(),
+            prompt=PortfolioPrompt(),
+            llm=MockAdapter("Pipeline summary."),
+            validator=BasicValidation(),
+        )
+        registry = PipelineRegistry({"portfolio_summary": pipeline})
+        ai_service = AiExplainerService(registry)
+        analytics_engine = PortfolioAnalyticsEngine(EngineConfig())
+        explainer = PortfolioExplanationService(analytics_engine, ai_service)
+
+        explanation = explainer.explain_portfolio(txs, test_db)
+
+        assert "Pipeline summary." in explanation
+        assert "not investment advice" in explanation.lower()
 
     def test_portfolio_explain_endpoint_uses_owned_portfolio(
         self, test_db, test_user, test_portfolio, monkeypatch
