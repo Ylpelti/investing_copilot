@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+from app.schemas.llm_provider import LLMProvider
 
 
 class Settings(BaseSettings):
@@ -8,8 +9,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
     database_url: str
+
+
     environment: str = "development"
-    openai_api_key: str = Field(min_length=32)
+
+    llm_provider: LLMProvider = LLMProvider.OPENAI
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
+    
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -54,6 +54,9 @@ def import_portfolio(
 
     return {"detail": "Import completed successfully."}
 
+@router.post("/{portfolio.id}/explain")
+def explain_portfolio(portfolio_id:int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    
 
 
 
