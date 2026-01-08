@@ -7,9 +7,9 @@ import jwt
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.ai.adapters.factory import create_llm_adapter
+
 from app.core.config import settings
-from app.ai.adapters.base_adapter import LLMAdapter
+
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth_scheme)) -> User:
     crud = UserCrud(db)
@@ -30,8 +30,3 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth_s
         raise credentials_exception
     return user
 
-def get_llm_adapter() -> LLMAdapter:
-    return create_llm_adapter(settings)
-
-def get_ai_service(llm: LLMAdapter = Depends(get_llm_adapter)):
-    

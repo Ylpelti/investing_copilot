@@ -1,23 +1,10 @@
+from typing import Dict, Any
+from app.ai.pipelines.registry import PipelineRegistry
+
 class AiExplainerService:
-    def __init__(
-            self,
-            context_builder,
-            prompt_template,
-            llm_adapter,
-            basic_validation
-    ):
-        self.contex_builder = context_builder
-        self.prompt_template = prompt_template
-        self.llm_adapter = llm_adapter
-        self.basic_validation = basic_validation
+    def __init__(self, registry: PipelineRegistry):
+        self.registry = registry
 
-    def explain(self, analytics):
-        context = self.contex_builder.build(analytics)
-
-        message = self.prompt_template.render(context)
-
-        response_raw = self.llm_adapter.generate(message)
-
-        response = self.basic_validation.validate(response_raw)
-
-        return response
+    def explain(self, analytic_results: Dict[str, Any], kind: str) -> str:
+        pipeline = self.registry.get(kind)
+        return pipeline.run(analytic_results)

@@ -1,8 +1,9 @@
-from app.ai.context.context_builder import BaseContext
+from app.ai.context.base_context_builder import BaseContext
+from typing import Dict, Any
 
 class PortfolioContextBuilder(BaseContext):
 
-    def build(self, analytic_result: dict):
+    def build(self, analytic_result: Dict[str, Any]):
         nav = analytic_result["data"]["NAV"]
         returns = analytic_result["returns"]["simple return"]
 
