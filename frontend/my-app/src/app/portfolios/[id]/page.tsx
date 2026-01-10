@@ -1,6 +1,8 @@
 import { PositionTable } from "@/components/positions/positionList"
 import { getPortfolioById } from "@/lib/api/portfolio"
 import { getPositions } from "@/lib/api/position"
+import { getPortfolioTransactions } from "@/lib/api/transactions"
+import { TransactionList } from "@/components/portfolio/transactionList"
 
 type PageProps = {
     params: Promise<{
@@ -13,11 +15,16 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
     const portfolioId = Number(id)
     const portfolio = await getPortfolioById(portfolioId)
     const positions = await getPositions(portfolioId)
+    const transactions = await getPortfolioTransactions(portfolioId)
     return (
         <div>
             <h1>{portfolio.name}</h1>
             <PositionTable positions={positions}/>
+
+            <h1>Transactions</h1>
+            <TransactionList transactions={transactions} />
         </div>
+        
     )
 }
 
