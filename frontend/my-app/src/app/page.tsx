@@ -1,7 +1,9 @@
-import { PortfolioPage } from "./portfolios/page";
 
 export default function Home() {
   return (
-    <PortfolioPage />
+    <div>
+      <h1>This is investing copilot</h1>
+      <p>Frontend runnning</p>
+    </div>
   );
 }

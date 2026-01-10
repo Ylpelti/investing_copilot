@@ -1,6 +1,6 @@
 import { PortfolioRead } from "@/types/portfolio";
 
-export const mockPortfolios: PortfolioRead[] = [
+export let mockPortfolios: PortfolioRead[] = [
   {
     id: 1,
     user_id: 42,
@@ -26,3 +26,7 @@ export const mockPortfolios: PortfolioRead[] = [
     updated_at: "2024-04-15T10:10:00Z",
   },
 ]; 
+
+export function setMockPortfolios(next: PortfolioRead[]) {
+  mockPortfolios = next;
+}
