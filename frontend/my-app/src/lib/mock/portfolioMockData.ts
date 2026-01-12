@@ -1,4 +1,4 @@
-import { PortfolioRead } from "@/types/portfolio";
+import { PortfolioCreate, PortfolioRead } from "@/types/portfolio";
 
 export let mockPortfolios: PortfolioRead[] = [
   {
@@ -30,3 +30,7 @@ export let mockPortfolios: PortfolioRead[] = [
 export function setMockPortfolios(next: PortfolioRead[]) {
   mockPortfolios = next;
 }
+
+export const addPortfolio= (portfolio:PortfolioCreate) => {
+  
+} 
