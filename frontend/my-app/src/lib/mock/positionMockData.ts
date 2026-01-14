@@ -1,7 +1,10 @@
 // src/lib/mocks/positionMockData.ts
-import { PositionRead } from "@/types/position";
+import { PortfolioRead } from "@/types/portfolio";
+import { PositionRead, PositionCreate } from "@/types/position";
 
-export const mockPositions: PositionRead[] = [
+let nextId = 6
+
+export let mockPositions: PositionRead[] = [
   {
     id: 1,
     portfolio_id: 1,
@@ -43,3 +46,20 @@ export const mockPositions: PositionRead[] = [
     buy_price: 495.10,
   },
 ];
+
+export const createMockPosition = (data: PositionCreate): PositionRead => {
+  if (!data) {
+    throw new Error("Data missing")
+  }
+  const newPosition:PositionRead = {
+    id: nextId++,
+    symbol: data.symbol,
+    quantity: data.quantity,
+    portfolio_id: data.portfolio_id,
+    stock_id: data.stock_id,
+    buy_price: data.buy_price
+  }
+  mockPositions = [...mockPositions, newPosition]
+
+  return newPosition
+}

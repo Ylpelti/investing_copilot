@@ -2,14 +2,14 @@ import { PortfolioRead } from "@/types/portfolio"
 
 export const PortfolioList = ({ portfolios }: {portfolios: PortfolioRead[]}) => {
     return (
-        <ul>
+        <div>
             {portfolios.map(p => (
-                <li key={p.id}>
+                <div key={p.id}>
                     <h1>{p.name}</h1>
                     <p>{p.description}</p>
-                </li>
+                </div>
 
             ))}
-        </ul>
+        </div>
     )
 }

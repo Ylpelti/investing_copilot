@@ -3,7 +3,7 @@ import { UserRead, UserCreate } from "../../types/user"
 
 export const mockUsersRead: UserRead[] = [
   {
-    id: 1,
+    id: 4,
     username: "alice_investor",
     email: "new_user_1@example.com"
   },
@@ -19,6 +19,12 @@ export const mockUsersRead: UserRead[] = [
   }
 ]
 
+export const currentUser: UserRead = {
+  id: 42,
+  username: "Ylpelti",
+  email: "yl.pelti@example.com"
+}
+
 
 export const mockUsersCreate: UserCreate[] = [
   {
@@ -32,3 +38,7 @@ export const mockUsersCreate: UserCreate[] = [
     email: "new_user_2@example.com"
   }
 ]
+
+export const getCurrentUser = () => {
+  return currentUser
+}

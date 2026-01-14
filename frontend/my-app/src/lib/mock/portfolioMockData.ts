@@ -27,10 +27,32 @@ export let mockPortfolios: PortfolioRead[] = [
   },
 ]; 
 
+let nextId = 4
+
+export const createMockPortfolio = (payload: PortfolioCreate): PortfolioRead => {
+  if (!payload.name || payload.name.trim().length < 2) {
+    throw new Error('Name required')
+  }
+
+  const now = new Date().toISOString()
+
+  const newPortfolio:PortfolioRead = {
+    id: nextId++,
+    user_id: payload.user_id,
+    name: payload.name,
+    description: payload.description,
+    created_at: now,
+    updated_at: now
+  } 
+
+  mockPortfolios = [...mockPortfolios, newPortfolio]
+  return newPortfolio
+}
+
 export function setMockPortfolios(next: PortfolioRead[]) {
   mockPortfolios = next;
 }
+export const getUserPortfolios = (userId: number) => {
+  return mockPortfolios.filter(u => u.user_id === userId )
+}
 
-export const addPortfolio= (portfolio:PortfolioCreate) => {
-  
-} 

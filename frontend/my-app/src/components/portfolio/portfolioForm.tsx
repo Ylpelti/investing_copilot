@@ -1,46 +1,41 @@
 'use client'
 
+import  { CreatePortfolioState } from "@/actions/portfolio_actions"
+import { useActionState } from "react"
 
-import { useState } from "react"
 
-type PortfolioFormData = {
-    name: string
-    desciption?: string
-}
 
 type Props = {
-    onSubmit: (data: PortfolioFormData ) => void
+    action: (
+        prevState: CreatePortfolioState,
+        formData: FormData
+    ) => Promise<CreatePortfolioState>
 }
 
+const initialState: CreatePortfolioState = { success: false}
 
+export const PortfolioForm = ({ action }: Props) => {
+    const [state, formAction, isPending] = useActionState(
+        action,
+        initialState
+    )
 
-export const PortfolioForm = ({ onSubmit }: Props) => {
-    const [form, setForm] = useState({
-        name: "",
-        desciption: ""
-    })
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        onSubmit(form)
-    }
+    
 
     return (
-        <form action="">
+        <form action={formAction}>
             <h1>Add new portfolio</h1>
 
-            <input type="text"
-            placeholder="Portfolio name"
-            value={form.name}
-            onChange={e => setForm({...form, name: e.target.value})} />
+            <input name="name" placeholder="name" />
+            <input name="description" placeholder="description" />
 
-            <input type="text"
-            placeholder="Descirption"
-            value={form.desciption}
-            onChange={e => setForm({...form, desciption: e.target.value})} />
+            <button type="submit" disabled={isPending}>
+                {isPending ? "Saving..." : "Add new portfolio"}
+            </button>
 
-
-            <button onSubmit={handleSubmit}> Add new portfolio</button>
+            
+            {state.error && <p>{state.error}</p>}
+            {state.success && <p>Portfolio added</p>}
         </form>
     )
 }

@@ -1,39 +1,28 @@
-"use client"
 
-import { getPortfolios } from "@/lib/api/portfolio"
 import { PortfolioList } from "@/components/portfolio/portfolioList"
 import { PortfolioForm } from "@/components/portfolio/portfolioForm"
-import { useEffect, useState } from "react"
-import { PortfolioRead } from "@/types/portfolio"
-import { createPortfolio } from "@/lib/api/portfolio"
+
+import { getCurrentUser } from "@/lib/mock/userMockData"
+import { getUserPortfolios } from "@/lib/mock/portfolioMockData"
+import { createPortfolioAction } from "@/actions/portfolio_actions"
 
 
-type PortfolioFormData = {
-    name: string
-    description?: string
-}
 
-const PortfolioPage =  () => {
-    const [portfolios, setPortfolios] = useState<PortfolioRead[]>([])
 
-    useEffect(() => {
-        getPortfolios().then(setPortfolios)
-    }, [])
+const PortfolioPage = async () => {
+    
+    const current_user_id = await getCurrentUser().id
+    const portfolios = await getUserPortfolios(current_user_id)
+    
+    const boundCreatePortfolio = createPortfolioAction.bind(null, {
+        userId: current_user_id
+    }) 
 
-    const handleCreate = async (data: PortfolioFormData) => {
-        const payload = {
-            user_id: Number(getCurrentUser()),
-            name: data.name,
-            description: data.description
-        }
-        const created = await createPortfolio(payload)
-        setPortfolios(prev => [...prev, created])
-    }
     
     return (
         <div>
         <PortfolioList portfolios={portfolios} />
-        <PortfolioForm onSubmit={handleCreate}/>
+        <PortfolioForm action={boundCreatePortfolio}/>
         </div>
     )
 }
