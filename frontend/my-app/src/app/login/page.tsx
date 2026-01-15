@@ -1,13 +1,12 @@
-import { getUsers } from "@/lib/api/auth";
+"use server"
 import { LoginForm } from "@/components/users/loginForm";
-import { UserLogin } from "@/types/user";
+import { loginAction } from "@/actions/user_actions";
+
 
 const UsersPage = async () => {
-    const handleSubmit = async (data: UserLogin) => {
-        await loginUser(data)
-    }
+
     return (
-        <LoginForm onSubmit={handleSubmit} />
+        <LoginForm action={loginAction} />
     )
 }
 

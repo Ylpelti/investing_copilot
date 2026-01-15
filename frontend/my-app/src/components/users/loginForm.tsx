@@ -1,38 +1,42 @@
 'use client'
 
-import { useState } from "react"
-import { UserLogin } from "@/types/user"
+import { useActionState } from "react"
+
+import { actionState } from "@/types/action"
 
 type Props = {
-    onSubmit: (data: UserLogin) => void
+    action: (
+        prevState: actionState,
+        formData: FormData
+    ) => Promise<actionState>
 }
 
-export const LoginForm = ({ onSubmit }: Props) => {
-    const [form, setForm] = useState<UserLogin>({
-        username: "",
-        password: ""
-    })
+const initialState: actionState = { success: false }
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        onSubmit(form)
-    }
-
+export const LoginForm = ({ action }: Props) => {
+    const [state, formAction, isPending] = useActionState(
+        action,
+        initialState
+    )
+    
     return (
-        <form onSubmit={handleSubmit}>
+        <form action={formAction}>
             <h1>Login form</h1>
             <input type="text"
-            placeholder="username" 
-            value={form.username}
-            onChange={e => setForm({...form, username: e.target.value})}/>
+            placeholder="username"
+            name="username" 
+            />
 
             <input type="text"
             placeholder="password"
-            value={form.password}
-            onChange={e => setForm({...form, password: e.target.value})} />
+            name="password"
+             />
 
-            <button type="submit"> Login </button>
-
+            <button type="submit" disabled={isPending}> 
+                {isPending ? "Login in..." : "Login"}
+            </button>
+                {state.error && <p>{state.error}</p>}
+                
         </form>
     )
 }

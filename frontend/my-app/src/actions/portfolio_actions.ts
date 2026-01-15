@@ -1,8 +1,8 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { createMockPortfolio } from "@/lib/mock/portfolioMockData"
 import { PortfolioCreate } from "@/types/portfolio"
+import { createPortfolio } from "@/lib/api/portfolio"
 
 type actionContext = {
     userId:number
@@ -31,7 +31,7 @@ export const createPortfolioAction = async (
     
 
 
-    await createMockPortfolio(payload)
+    await createPortfolio(payload)
     revalidatePath('/portfolios')
 
     return { success: true}

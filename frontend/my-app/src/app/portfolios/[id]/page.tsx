@@ -6,7 +6,7 @@ import { getPortfolioTransactions } from "@/lib/api/transactions"
 import { TransactionList } from "@/components/portfolio/transactionList"
 import { PositionForm } from "@/components/positions/positionForm"
 
-import { getCurrentUser } from "@/lib/mock/userMockData"
+import { getCurrentUser } from "@/lib/api/auth/auth"
 import { createPositionAction } from "@/actions/position_action"
 
 
@@ -19,7 +19,7 @@ type PageProps = {
 const PortfolioDetailPage = async ({ params }: PageProps) => {
     const { id } = await params
     const portfolioId = Number(id)
-    const current_user_id = getCurrentUser().id
+    const current_user = await getCurrentUser()
     
     const portfolio = await getPortfolioById(portfolioId)
     const positions = await getPositions(portfolioId)
@@ -28,7 +28,7 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
     
     const boundCreatePosition = createPositionAction.bind(null, {
         portfolioId,
-        userId: current_user_id
+        userId: current_user.id
     })
    
     return (
