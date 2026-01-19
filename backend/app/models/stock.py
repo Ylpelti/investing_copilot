@@ -1,9 +1,10 @@
-from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, func
+from sqlalchemy import Integer, String, Numeric, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.base_class import Base
 from typing import Optional
 from datetime import datetime
 from typing import TYPE_CHECKING
+from decimal import Decimal
 
 if TYPE_CHECKING:
     from app.models.positio import Position
@@ -14,16 +15,15 @@ class Stock(Base):
     __tablename__ = "stocks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    ticker: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    isin: Mapped[Optional[str]] = mapped_column(String, unique=False, index=True, nullable=True)
-    name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    close_price: Mapped[Optional[float]] = mapped_column(Float, nullable=False)
-    sector: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    ticker: Mapped[str] = mapped_column(String(16), unique=True, index=True, nullable=False)
+    isin: Mapped[str] = mapped_column(String(32), unique=True, index=True, nullable=False)
+    name: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    close_price: Mapped[Optional[Decimal]] = mapped_column(Numeric(18, 6), nullable=True)
+    sector: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
-        onupdate=func.now(),
         nullable=True)
     
     positions: Mapped[list["Position"]] = relationship("Position", back_populates="stock")
@@ -32,4 +32,4 @@ class Stock(Base):
 
 
     def __repr__(self):
-        return f"<Stock {self.ticker} ({self.name or " "})>"
+        return f"<Stock {self.ticker} ({self.name or ''})>"

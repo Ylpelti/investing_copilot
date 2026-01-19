@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserCreate
 from app.security.hashing import hash_password
 from app.core.errors.exceptions import UsernameDuplicateError, EmailDuplicateError
 from app.crud.base_crud import BaseCrud

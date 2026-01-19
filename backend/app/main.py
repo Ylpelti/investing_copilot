@@ -8,11 +8,23 @@ from app.tasks.portfolio_analyysi import load_prices_df, get_positions_map, port
 from datetime import date
 from app.core.errors.errorhandler import app_error_handler, generic_exception_handler
 from app.core.errors.exceptions import AppError
-from typing import cast
+from fastapi.middleware.cors import CORSMiddleware
 
+origins = [
+    "https://localhost:3000"
+]
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+
+)
 
 app.add_exception_handler(AppError, app_error_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
@@ -25,6 +37,7 @@ app.include_router(users.router)
 app.include_router(portfolio.router)
 app.include_router(stocks_price.router)
 app.include_router(token.router)   
+
 
 
 

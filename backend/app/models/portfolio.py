@@ -16,7 +16,7 @@ class Portfolio(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[str] = mapped_column(String(100), nullable=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="Cascade"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
 
     created_at: Mapped[datetime] = mapped_column(
@@ -26,9 +26,8 @@ class Portfolio(Base):
         
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
         onupdate=func.now(),
-        nullable=False)
+        nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="portfolios", lazy="joined")  
     positions: Mapped[list["Position"]] = relationship(

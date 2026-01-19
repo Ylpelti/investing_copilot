@@ -11,6 +11,7 @@ from app.security.dependencies import get_current_user
 from app.services.portfolio_import_service import parse_csv
 from app.services.portfolio_explanation_service import PortfolioExplanationService
 from app.api.dependencies import get_portfolio_explanation_service
+from typing import List
 
 router = APIRouter(
         prefix="/portfolios",
@@ -27,6 +28,11 @@ def create_portfolio(
     crud = PortfolioCrud(db)
     portfolio_in.user_id = current_user.id
     return crud.create_portfolio(portfolio_in)
+
+@router.get("/me", response_model=List[PortfolioRead])
+def get_portfolio_list(db: Session = Depends(get_db), currrent_user: User = Depends(get_current_user)):
+    crud = PortfolioCrud(db)
+    return crud.get_user_owned_portfolios(currrent_user.id)
 
 @router.get("/{portfolio_id}", response_model=PortfolioRead)
 def get_portfolio(portfolio_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

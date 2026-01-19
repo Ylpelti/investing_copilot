@@ -80,8 +80,8 @@ class TestTokenAPI:
         response = client.post("/token", data=data)
         token = response.json()["access_token"]
 
-        # Decode to verify structure and `sub` field
+        
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        assert payload["sub"] == setup_user["user"].username
+        assert payload["sub"] == str(setup_user["user"].id)
         assert "exp" in payload
         assert "type" in payload

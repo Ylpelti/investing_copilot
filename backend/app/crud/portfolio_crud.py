@@ -30,6 +30,14 @@ class PortfolioCrud(BaseCrud[Portfolio]):
             raise Forbidden()
         return portfolio
     
+    def get_user_owned_portfolios(self, user_id):
+        portfolios = (
+            self.db.query(Portfolio)
+            .filter(Portfolio.user_id == user_id)
+            .all()
+        )
+        return portfolios
+    
     def update_portfolio(self, portfolio_id: int, portfolio_in: PortfolioUpdate, current_user_id: int) -> Portfolio:
         portfolio = self.get_owned_portfolio(portfolio_id=portfolio_id, user_id=current_user_id)
         data = portfolio_in.model_dump(exclude_unset=True)

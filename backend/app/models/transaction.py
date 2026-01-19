@@ -1,9 +1,10 @@
 from enum import Enum as PyEnum
-from sqlalchemy import Enum, Integer, Float, String, ForeignKey, DateTime, func, CheckConstraint
+from sqlalchemy import Enum, Numeric, Integer, String, ForeignKey, DateTime, func, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from app.db.base_class import Base
 from typing import TYPE_CHECKING
+from decimal import Decimal
 
 if TYPE_CHECKING:
     from app.models.portfolio import Portfolio
@@ -28,9 +29,9 @@ class PortfolioTransaction(Base):
     symbol: Mapped[str] = mapped_column(String, nullable=False, index=True)
 
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType, name="transaction_type_enum"), nullable=False)
-    quantity: Mapped[float] = mapped_column(Float, nullable=False)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
-    total_value: Mapped[float] = mapped_column(Float, nullable=False)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 6), nullable=False)
+    price: Mapped[Decimal] = mapped_column(Numeric(18, 6), nullable=False)
+    total_value: Mapped[Decimal] = mapped_column(Numeric(18, 6), nullable=False)
     
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

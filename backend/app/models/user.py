@@ -10,10 +10,10 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    username: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    pw_hash: Mapped[str] = mapped_column(String, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(32), unique=True, index=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    pw_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
     #created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
     #updated_at: Mapped[str] = mapped_column(DateTime(timezone=True), on_update=func.now())

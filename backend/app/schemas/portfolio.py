@@ -15,7 +15,7 @@ class PortfolioRead(PortfolioBase):
     id: int
     user_id: int
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime]
 
     
 

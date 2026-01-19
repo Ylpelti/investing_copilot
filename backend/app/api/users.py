@@ -22,6 +22,11 @@ def create_user(user: UserCreate, session: Session = Depends(get_db)):
 def read_user(current_user: User = Depends(get_current_user), session: Session = Depends(get_db)):
     crud = UserCrud(session)
     return crud.get_by_id(current_user.id)
+
+@router.get('/me', response_model=UserRead)
+def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
+    
     
 
 #@router.get("/", response_model=list[UserRead])
