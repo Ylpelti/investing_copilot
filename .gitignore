@@ -1,0 +1,84 @@
+# =====================
+# Python
+# =====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env/
+.env.*
+.venv/
+
+# =====================
+# FastAPI / Uvicorn
+# =====================
+*.log
+
+# =====================
+# Alembic
+# =====================
+alembic/versions/__pycache__/
+
+# ⚠️ DO NOT ignore alembic.ini
+# ⚠️ DO NOT ignore alembic/versions/*.py
+
+# =====================
+# Databases
+# =====================
+*.db
+*.sqlite
+*.sqlite3
+
+# =====================
+# Docker
+# =====================
+docker-data/
+postgres-data/
+pgdata/
+data/
+
+# Docker runtime artifacts
+.docker/
+docker-compose.override.yml
+
+# =====================
+# OS / Editor
+# =====================
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =====================
+# Testing / Coverage
+# =====================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Frontend build artifacts
+frontend/**/.next/
+frontend/**/dist/
+frontend/**/build/
+frontend/**/*.meta
+frontend/**/*.sst
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Turbopack / SWC / Vite caches
+frontend/**/.turbo/
+frontend/**/.swc/
