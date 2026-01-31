@@ -12,6 +12,7 @@ export const registerUser = async (data: UserCreate): Promise<UserRead> => {
         const nextId = mockUsersRead.length
             ? Math.max(...mockUsersRead.map(u => u.id)) + 1
             : 1
+        
         return {
             id: nextId,
             username: data.username,
@@ -29,6 +30,8 @@ export const loginRequest = async (username:string, password:string) => {
     const body = new URLSearchParams()
     body.set("username", username)
     body.set("password", password)
+    console.log("username:", username);
+    console.log("passworf: ", password);
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token`, {
         method: "POST",

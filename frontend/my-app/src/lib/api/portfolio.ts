@@ -1,8 +1,7 @@
-import * as mock from "../mock/portfolioMockData"
 import { PortfolioRead, PortfolioCreate } from "@/types/portfolio"
 import { apiRequest } from "../requests/http"
 import { authRequest } from "../requests/authRequest"
-import { getCurrentUser } from "./auth/auth"
+
 
 export const getUserPortfolios = async (): Promise<PortfolioRead[]> => {
     
@@ -12,11 +11,10 @@ export const getUserPortfolios = async (): Promise<PortfolioRead[]> => {
 }
 
 export const getPortfolioById = async (portfolio_id: number): Promise<PortfolioRead> => {
-    const portfolio = mock.mockPortfolios.find(p => p.id === portfolio_id)
-    if (!portfolio) {
-        throw new Error("Couldn't find portfolio with that id")
-    }
-    return portfolio
+    console.log("Trying fetch portfolio with id:", portfolio_id);
+    return authRequest<PortfolioRead>(`/portfolios/${portfolio_id}`, {
+        method: "GET",
+    })
 }
 
 export const createPortfolio = async (data: PortfolioCreate): Promise<PortfolioRead> => {
