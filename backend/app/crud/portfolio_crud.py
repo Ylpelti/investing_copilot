@@ -24,7 +24,7 @@ class PortfolioCrud(BaseCrud[Portfolio]):
     
     def get_owned_portfolio(self, portfolio_id: int, user_id: int) -> Portfolio:
         portfolio = (
-            self.db.query(portfolio_id)
+            self.db.query(Portfolio)
             .filter(
                 Portfolio.id == portfolio_id,
                 Portfolio.user_id == user_id
