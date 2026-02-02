@@ -11,7 +11,6 @@ class TransactionBase(BaseModel):
     quantity: float
     price: float 
     
-    timestamp: datetime = Field(..., description="Date when the trade occured")
     
 
     model_config = ConfigDict(from_attributes=True)
