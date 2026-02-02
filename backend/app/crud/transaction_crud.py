@@ -9,6 +9,7 @@ from app.crud.portfolio_crud import PortfolioCrud
 from app.crud.position_crud import PositionCrud
 from app.models.transaction import PortfolioTransaction
 from sqlalchemy.exc import IntegrityError
+from app.crud.stock_crud import StockCrud
 
 
 class TransactionCrud(BaseCrud):
@@ -17,9 +18,10 @@ class TransactionCrud(BaseCrud):
     def ceate_transaction(self, tx: TransactionCreate, current_user_id: int) -> PortfolioTransaction:
         portfolio_crud = PortfolioCrud(self.db)
         position_crud = PositionCrud(self.db)
+        stock_crud = StockCrud(self.db)
 
         portfolio = portfolio_crud.get_owned_portfolio(tx.portfolio_id, current_user_id)
-
+        stock = stock_crud.get_stock_by_ticker(tx.symbol)
         if tx.quantity <= 0 or tx.price <= 0:
             raise BadRequest(message="Quantity and price must be positive")
         
@@ -27,9 +29,9 @@ class TransactionCrud(BaseCrud):
 
         db_tx = PortfolioTransaction(
             portfolio_id = portfolio.id,
-            stock_id = tx.stock_id,
             symbol = tx.symbol,
             type = tx.type,
+            stock_id = stock.id, 
             quantity = tx.quantity,
             price = tx.price,
             total_value = total_value,
@@ -40,9 +42,9 @@ class TransactionCrud(BaseCrud):
             self.db.add(db_tx)
 
             if tx.type == TransactionType.BUY:
-                position_crud.create_or_update_on_buy(portfolio.id, tx)
+                position_crud.create_or_update_on_buy(portfolio.id, tx, stock)
             elif tx.type == TransactionType.SELL:
-                position_crud.update_position_on_sell(portfolio.id, tx)
+                position_crud.update_position_on_sell(portfolio.id, tx, stock)
 
             
             self.db.commit()
