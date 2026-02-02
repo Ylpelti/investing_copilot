@@ -1,7 +1,7 @@
 
 import { PositionTable } from "@/components/positions/positionList"
 import { getPortfolioById } from "@/lib/api/portfolio"
-import { getPositions } from "@/lib/api/position"
+import { getPortfolioPositions } from "@/lib/api/position"
 import { getPortfolioTransactions } from "@/lib/api/transactions"
 import { TransactionList } from "@/components/portfolio/transactionList"
 import { PositionForm } from "@/components/positions/positionForm"
@@ -22,7 +22,7 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
     const current_user = await getCurrentUser()
     
     const portfolio = await getPortfolioById(portfolioId)
-    const positions = await getPositions(portfolioId)
+    const positions = await getPortfolioPositions(portfolioId)
     const transactions = await getPortfolioTransactions(portfolioId)
 
     

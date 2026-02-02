@@ -21,8 +21,8 @@ export function PositionForm({ action }: Props) {
   return (
     <form action={formAction}>
       <input name="symbol" placeholder="Symbol" required />
-      <input name="quantity" type="number" min={1} required />
-      <input name="buy_price" type="number" step="0.01" min={0} required />
+      <input name="quantity" type="number" placeholder="quantity" min={1} required />
+      <input name="buy_price" type="number" placeholder="buy price" step="0.01" min={0} required />
 
       <button type="submit" disabled={isPending}>
         {isPending ? "Saving..." : "Add position"}
