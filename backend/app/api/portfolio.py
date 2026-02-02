@@ -12,6 +12,8 @@ from app.services.portfolio_import_service import parse_csv
 from app.services.portfolio_explanation_service import PortfolioExplanationService
 from app.api.dependencies import get_portfolio_explanation_service
 from typing import List
+from app.crud.position_crud import PositionCrud
+from app.schemas.positio import PositionRead
 
 router = APIRouter(
         prefix="/portfolios",
@@ -79,6 +81,16 @@ def explain_portfolio(
         "explanation": explanation
     }
 
+@router.get("/{portfolio_id}/positions", response_model=List[PositionRead])
+def get_portfolio_positions(
+    portfolio_id:int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    position_crud = PositionCrud(db)
+    return position_crud.get_portfolio_positions(portfolio_id, current_user.id)
+
+    
 
 
 

@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 class PositionCrud(BaseCrud):
     model = Position
 
-    def create_or_update_on_buy(self, tx: TransactionCreate) -> Position:
+    def create_or_update_on_buy(self, portfolio_id: int, tx: TransactionCreate) -> Position:
         position = (
             self.db.query(Position)
-            .filter_by(portfolio_id=tx.portfolio_id, stock_id = tx.stock_id)
+            .filter_by(portfolio_id=portfolio_id, stock_id = tx.stock_id)
             .first()
         )
 
@@ -57,10 +57,10 @@ class PositionCrud(BaseCrud):
         return position
 
 
-    def update_position_on_sell(self, tx: TransactionCreate) -> Position:
+    def update_position_on_sell(self, portfolio_id: int, tx: TransactionCreate) -> Position:
         position = (
             self.db.query(Position)
-            .filter_by(portfolio_id=tx.portfolio_id, stock_id = tx.stock_id)
+            .filter_by(portfolio_id=portfolio_id, stock_id = tx.stock_id)
             .first()
         )
 

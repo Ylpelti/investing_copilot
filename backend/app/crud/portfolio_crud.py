@@ -23,11 +23,16 @@ class PortfolioCrud(BaseCrud[Portfolio]):
         return db_portfolio
     
     def get_owned_portfolio(self, portfolio_id: int, user_id: int) -> Portfolio:
-        portfolio = self.get_by_id(portfolio_id)
+        portfolio = (
+            self.get_by_id(portfolio_id)
+            .filter(
+                Portfolio.id == portfolio_id,
+                Portfolio.user_id == user_id
+            ).first()
+            )
         if not portfolio:
-            raise NotFound()
-        if portfolio.user_id != user_id:
-            raise Forbidden()
+            raise Forbidden(message="No portfolio found")
+        
         return portfolio
     
     def get_user_owned_portfolios(self, user_id):
