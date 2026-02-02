@@ -40,9 +40,9 @@ class TransactionCrud(BaseCrud):
             self.db.add(db_tx)
 
             if tx.type == TransactionType.BUY:
-                position_crud.create_or_update_on_buy(tx)
+                position_crud.create_or_update_on_buy(portfolio.id, tx)
             elif tx.type == TransactionType.SELL:
-                position_crud.update_position_on_sell(tx)
+                position_crud.update_position_on_sell(portfolio.id, tx)
 
             
             self.db.commit()
