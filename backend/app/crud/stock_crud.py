@@ -3,6 +3,7 @@ from app.crud.base_crud import BaseCrud
 from app.models.stock import Stock
 from app.schemas.stock import StockCreate
 import logging
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from app.core.errors.exceptions import BadRequest, NotFound
 from typing import Optional
@@ -58,6 +59,24 @@ class StockCrud(BaseCrud):
         if not stock:
             raise NotFound(message=f"Not found with ticker: {ticker}")
         return stock
+    
+    def search_stock_by_ticker(self, query:str, limit: int = 5) -> list[Stock]:
+        q = query.strip().upper()
+
+        if not q:
+            return []
+        return (
+            self.db.query(Stock)
+            .filter(
+                or_(
+                Stock.ticker.ilike(f"{q}%"),
+                Stock.name.ilike(f"{q}%")
+                )
+            )
+            .order_by(Stock.ticker)
+            .limit(limit)
+            .all()
+        )
 
     
     

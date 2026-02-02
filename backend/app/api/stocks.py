@@ -26,5 +26,10 @@ def read_stock_by_ticker(ticker: str, db: Session = Depends(get_db)):
     crud = StockCrud(db)
     return crud.get_stock_by_ticker(ticker)
 
+@router.get("/search", response_model=list[StockRead])
+def search_stocks(q: str, db:Session = Depends(get_db)):
+    crud = StockCrud(db)
+    return crud.search_stock_by_ticker(q)
+
 
 

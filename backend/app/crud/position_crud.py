@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 import logging
 from app.models.portfolio import Portfolio
 from app.schemas.transactions import TransactionCreate
+from app.models.stock import Stock
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +17,10 @@ logger = logging.getLogger(__name__)
 class PositionCrud(BaseCrud):
     model = Position
 
-    def create_or_update_on_buy(self, portfolio_id: int, tx: TransactionCreate) -> Position:
+    def create_or_update_on_buy(self, portfolio_id: int, tx: TransactionCreate, stock: Stock) -> Position:
         position = (
             self.db.query(Position)
-            .filter_by(portfolio_id=portfolio_id, stock_id = tx.stock_id)
+            .filter_by(portfolio_id=portfolio_id, stock_id = stock.id)
             .first()
         )
 
@@ -40,7 +41,7 @@ class PositionCrud(BaseCrud):
         else:
             position = Position(
                 portfolio_id=tx.portfolio_id,
-                stock_id=tx.stock_id,
+                stock_id=stock.id,
                 quantity=tx.quantity,
                 buy_price=tx.price,
                 symbol=tx.symbol
@@ -57,10 +58,10 @@ class PositionCrud(BaseCrud):
         return position
 
 
-    def update_position_on_sell(self, portfolio_id: int, tx: TransactionCreate) -> Position:
+    def update_position_on_sell(self, portfolio_id: int, tx: TransactionCreate, stock: Stock) -> Position:
         position = (
             self.db.query(Position)
-            .filter_by(portfolio_id=portfolio_id, stock_id = tx.stock_id)
+            .filter_by(portfolio_id=portfolio_id, stock_id = stock.id)
             .first()
         )
 
