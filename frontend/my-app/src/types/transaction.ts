@@ -1,4 +1,7 @@
-type TransactionType = "BUY" | "SELL"
+export enum TransactionType  {
+    BUY = "BUY",
+    SELL = "SELL"
+}
 
 type TransactionBase = {
     portfolio_id: number
@@ -7,7 +10,6 @@ type TransactionBase = {
     type: TransactionType
     quantity: number
     price: number
-    timestamp: string
 }
 
 export type TransactionRead = TransactionBase & {
@@ -15,3 +17,11 @@ export type TransactionRead = TransactionBase & {
     total_value: number
 }
 
+export type TransactionCreate = TransactionBase
+
+export type TransactionFormData = {
+    ticker: string
+    quantity: number
+    buy_price: number
+    type: TransactionType
+}

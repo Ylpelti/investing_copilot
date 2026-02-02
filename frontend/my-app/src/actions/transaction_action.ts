@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { createMockPosition } from "@/lib/mock/positionMockData"
-import type { PositionCreate } from "@/types/position"
+import { createTransaction } from "@/lib/api/transactions"
+import { TransactionCreate, TransactionType } from "@/types/transaction"
 
 type ActionContext = {
   portfolioId: number
@@ -14,7 +15,7 @@ export type CreatePositionState = {
   error?: string
 }
 
-export async function createPositionAction(
+export async function createTransactionAction(
   context: ActionContext,
   prevState: CreatePositionState,
   formData: FormData
@@ -23,20 +24,32 @@ export async function createPositionAction(
     const symbol = String(formData.get("symbol") ?? "").trim()
     const quantity = Number(formData.get("quantity"))
     const buy_price = Number(formData.get("buy_price"))
+    const rawType = String(formData.get("type"))
 
     if (!symbol) throw new Error("Symbol is required")
     if (quantity <= 0) throw new Error("Quantity must be greater than 0")
     if (buy_price <= 0) throw new Error("Buy price must be greater than 0")
+    
+    let type:TransactionType
 
-    const payload: PositionCreate = {
-      symbol,
-      quantity,
-      buy_price,
-      portfolio_id: context.portfolioId,
-      stock_id: 1, // derived server-side
+    if (rawType == "Buy") {
+      type = TransactionType.BUY
+    } else if(rawType == "Sell") {
+      type = TransactionType.SELL
+    } else {
+      throw new Error("Invalid transaction type")
     }
-
-    await createMockPosition(payload)
+    
+    const payload: TransactionCreate = {
+      portfolio_id: context.portfolioId,
+      stock_id: 1,
+      symbol,
+      type,
+      quantity,
+      price: buy_price
+    }
+    
+    await createTransaction(payload)
 
     revalidatePath(`/portfolios/${context.portfolioId}`)
 

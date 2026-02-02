@@ -7,7 +7,7 @@ import { TransactionList } from "@/components/portfolio/transactionList"
 import { PositionForm } from "@/components/positions/positionForm"
 
 import { getCurrentUser } from "@/lib/api/auth/auth"
-import { createPositionAction } from "@/actions/position_action"
+import { createTransactionAction } from "@/actions/transaction_action"
 
 
 type PageProps = {
@@ -26,7 +26,7 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
     const transactions = await getPortfolioTransactions(portfolioId)
 
     
-    const boundCreatePosition = createPositionAction.bind(null, {
+    const boundCreatePosition = createTransactionAction.bind(null, {
         portfolioId,
         userId: current_user.id
     })

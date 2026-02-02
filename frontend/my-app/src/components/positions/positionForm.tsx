@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
-import type { CreatePositionState } from "@/actions/position_action"
+import type { CreatePositionState } from "@/actions/transaction_action"
 
 type Props = {
   action: (
@@ -23,6 +23,10 @@ export function PositionForm({ action }: Props) {
       <input name="symbol" placeholder="Symbol" required />
       <input name="quantity" type="number" placeholder="quantity" min={1} required />
       <input name="buy_price" type="number" placeholder="buy price" step="0.01" min={0} required />
+      <select name="type" id="type">
+        <option value="Buy"></option>
+        <option value="Sell"></option>
+      </select>
 
       <button type="submit" disabled={isPending}>
         {isPending ? "Saving..." : "Add position"}
