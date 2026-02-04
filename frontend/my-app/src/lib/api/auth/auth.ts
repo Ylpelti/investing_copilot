@@ -1,6 +1,6 @@
 import { UserRead, UserCreate, UserLogin } from "@/types/user";
 import { mockUsersRead } from "../../mock/userMockData";
-import { apiRequest, usingMock } from "../../requests/http";
+import { apiRequest } from "../../requests/http";
 import { authRequest } from "@/lib/requests/authRequest";
 
 export const getUsers = async (): Promise<UserRead[]> => {
@@ -8,17 +8,7 @@ export const getUsers = async (): Promise<UserRead[]> => {
 }
 
 export const registerUser = async (data: UserCreate): Promise<UserRead> => {
-    if (usingMock()) {
-        const nextId = mockUsersRead.length
-            ? Math.max(...mockUsersRead.map(u => u.id)) + 1
-            : 1
-        
-        return {
-            id: nextId,
-            username: data.username,
-            email: data.email
-        }
-    }
+    
 
     return apiRequest<UserRead>("/users", {
         method: "POST",

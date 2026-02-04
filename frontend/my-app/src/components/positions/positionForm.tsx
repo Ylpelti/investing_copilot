@@ -1,7 +1,9 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import type { CreatePositionState } from "@/actions/transaction_action"
+import { StockSearch } from "../stock/search/stockSearch"
+import { StockOption } from "@/types/stock"
 
 type Props = {
   action: (
@@ -17,15 +19,17 @@ export function PositionForm({ action }: Props) {
     action,
     initialState
   )
+  const [selectedStock, setSelectedStock] = useState<StockOption | null>(null)
 
   return (
     <form action={formAction}>
+      <StockSearch onSelect={stock => setSelectedStock(stock)} />
       <input name="symbol" placeholder="Symbol" required />
       <input name="quantity" type="number" placeholder="quantity" min={1} required />
       <input name="buy_price" type="number" placeholder="buy price" step="0.01" min={0} required />
       <select name="type" id="type">
-        <option value="Buy"></option>
-        <option value="Sell"></option>
+        <option value="Buy">Buy</option>
+        <option value="Sell">Sell</option>
       </select>
 
       <button type="submit" disabled={isPending}>
