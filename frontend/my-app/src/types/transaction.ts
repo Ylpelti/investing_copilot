@@ -6,7 +6,6 @@ export enum TransactionType  {
 type TransactionBase = {
     portfolio_id: number
     stock_id: number
-    symbol:string
     type: TransactionType
     quantity: number
     price: number
@@ -20,7 +19,7 @@ export type TransactionRead = TransactionBase & {
 export type TransactionCreate = TransactionBase
 
 export type TransactionFormData = {
-    ticker: string
+    stock_id: number
     quantity: number
     buy_price: number
     type: TransactionType

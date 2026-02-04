@@ -11,6 +11,7 @@ const UsersPage = async () => {
         <LoginForm action={loginAction} />
         <button>
         <Link href={"/register"}>Register new user</Link>
+        <Link href={"/me"}>To me page</Link>
         </button>
         </div>
     )

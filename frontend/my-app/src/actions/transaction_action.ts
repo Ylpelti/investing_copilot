@@ -21,12 +21,12 @@ export async function createTransactionAction(
   formData: FormData
 ): Promise<CreatePositionState> {
   try {
-    const symbol = String(formData.get("symbol") ?? "").trim()
+    const stock_id = Number(formData.get("stock_id"))
     const quantity = Number(formData.get("quantity"))
     const buy_price = Number(formData.get("buy_price"))
     const rawType = String(formData.get("type"))
 
-    if (!symbol) throw new Error("Symbol is required")
+    if (!stock_id) throw new Error("Symbol is required")
     if (quantity <= 0) throw new Error("Quantity must be greater than 0")
     if (buy_price <= 0) throw new Error("Buy price must be greater than 0")
     
@@ -42,8 +42,7 @@ export async function createTransactionAction(
     
     const payload: TransactionCreate = {
       portfolio_id: context.portfolioId,
-      stock_id: 1,
-      symbol,
+      stock_id,
       type,
       quantity,
       price: buy_price

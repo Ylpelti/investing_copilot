@@ -24,13 +24,13 @@ export function PositionForm({ action }: Props) {
   return (
     <form action={formAction}>
       <StockSearch onSelect={stock => setSelectedStock(stock)} />
-      <input name="symbol" placeholder="Symbol" required />
+        <input type="hidden" name="stock_id" value={selectedStock?.id ?? ""} />
       <input name="quantity" type="number" placeholder="quantity" min={1} required />
       <input name="buy_price" type="number" placeholder="buy price" step="0.01" min={0} required />
       <select name="type" id="type">
         <option value="Buy">Buy</option>
         <option value="Sell">Sell</option>
-      </select>
+      </select> 
 
       <button type="submit" disabled={isPending}>
         {isPending ? "Saving..." : "Add position"}
