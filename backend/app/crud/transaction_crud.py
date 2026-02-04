@@ -21,7 +21,7 @@ class TransactionCrud(BaseCrud):
         stock_crud = StockCrud(self.db)
 
         portfolio = portfolio_crud.get_owned_portfolio(tx.portfolio_id, current_user_id)
-        stock = stock_crud.get_stock_by_ticker(tx.symbol)
+        stock = stock_crud.get_id_or_404(tx.stock_id)
         if tx.quantity <= 0 or tx.price <= 0:
             raise BadRequest(message="Quantity and price must be positive")
         
@@ -29,7 +29,6 @@ class TransactionCrud(BaseCrud):
 
         db_tx = PortfolioTransaction(
             portfolio_id = portfolio.id,
-            symbol = tx.symbol,
             type = tx.type,
             stock_id = stock.id, 
             quantity = tx.quantity,

@@ -3,7 +3,7 @@ from app.models.transaction import TransactionType
 
 class TransactionBase(BaseModel):
     portfolio_id: int
-    symbol: str
+    stock_id: int
     type: TransactionType
     quantity: float
     price: float 
@@ -18,6 +18,7 @@ class TransactionCreate(TransactionBase):
 class TransactionRead(TransactionBase):
     id:int
     total_value: float
-    stock_id: int
+    symbol: str
+    
     
 

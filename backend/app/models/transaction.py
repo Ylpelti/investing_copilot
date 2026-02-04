@@ -19,14 +19,13 @@ class TransactionType(str, PyEnum):
 class PortfolioTransaction(Base):
     __tablename__ = "transactions"
     __table_args__ = (
-    CheckConstraint("quantity >= 0", name="check_quantity_non_negative"),
+    CheckConstraint("quantity > 0", name="check_quantity_non_negative"),
     CheckConstraint("price >= 0", name="check_price_non_negative"),
 )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     portfolio_id: Mapped[int] = mapped_column(ForeignKey("portfolios.id", ondelete="CASCADE"), nullable=False)
     stock_id: Mapped[int] = mapped_column(ForeignKey("stocks.id"), nullable=False)
-    symbol: Mapped[str] = mapped_column(String, nullable=False, index=True)
 
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType, name="transaction_type_enum"), nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric(18, 6), nullable=False)
@@ -35,6 +34,7 @@ class PortfolioTransaction(Base):
     
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        server_default=func.now(),
         nullable=False,
         index=True
     )
@@ -43,4 +43,4 @@ class PortfolioTransaction(Base):
     stock: Mapped["Stock"] = relationship("Stock", back_populates="transactions")
 
     def __repr__(self):
-        return f"<Transaction id={self.id}, type={self.type}, symbol={self.symbol}, qty={self.quantity}, price={self.price}>"
+        return f"<Transaction id={self.id}, type={self.type},  qty={self.quantity}, price={self.price}>"
