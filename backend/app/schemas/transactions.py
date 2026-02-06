@@ -1,12 +1,15 @@
 from pydantic import BaseModel, ConfigDict
 from app.models.transaction import TransactionType
+from datetime import datetime
+from decimal import Decimal
 
 class TransactionBase(BaseModel):
     portfolio_id: int
     stock_id: int
     type: TransactionType
-    quantity: float
-    price: float 
+    quantity: Decimal
+    price: Decimal 
+    timestamp: datetime
     
     
 
@@ -17,8 +20,8 @@ class TransactionCreate(TransactionBase):
 
 class TransactionRead(TransactionBase):
     id:int
-    total_value: float
-    symbol: str
+    total_value: Decimal
+    
     
     
 
