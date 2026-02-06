@@ -31,7 +31,7 @@ class PositionCrud(BaseCrud):
             ) / new_total_quantity
 
             logger.debug(
-                f"Updating existing position {tx.symbol}: "
+                f"Updating existing position {stock.ticker}: "
                 f"old_qty={position.quantity}, new_qty={new_total_quantity}, "
                 f"new_avg_price={new_avg_price}"
             )
@@ -44,11 +44,11 @@ class PositionCrud(BaseCrud):
                 stock_id=stock.id,
                 quantity=tx.quantity,
                 buy_price=tx.price,
-                symbol=tx.symbol
+                symbol=stock.ticker
             )
             self.db.add(position)
             
-            logger.debug(f"Created new position for {tx.symbol} in portfolio {tx.portfolio_id}")
+            logger.debug(f"Created new position for {stock.ticker} in portfolio {tx.portfolio_id}")
         try:
             self.db.flush()
         except IntegrityError:
@@ -73,12 +73,12 @@ class PositionCrud(BaseCrud):
         
         position.quantity -= tx.quantity
         logger.debug(
-            f"Selling {tx.quantity} {tx.symbol}, remaining quantity={position.quantity}"
+            f"Selling {tx.quantity} {stock.ticker}, remaining quantity={position.quantity}"
         )
 
         if position.quantity == 0:
             self.db.delete(position)
-            logger.debug(f"Position {tx.symbol} removed (quantity 0)")
+            logger.debug(f"Position {stock.ticker} removed (quantity 0)")
 
         self.db.flush()
         return position

@@ -1,12 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from decimal import Decimal
 
 class PositionBase(BaseModel):
     symbol: str
-    quantity: float
+    quantity: Decimal
     portfolio_id: int
     stock_id: int
-    buy_price: Optional[float] = None
+    buy_price: Optional[Decimal] = None
 
 
 class PositionCreate(PositionBase):
@@ -18,5 +19,5 @@ class PositionRead(PositionBase):
 
 
 class PositionUpdate(PositionBase):
-    quantity: Optional[float] = None
-    buy_price: Optional[float] = None
+    quantity: Optional[Decimal] = None
+    buy_price: Optional[Decimal] = None

@@ -1,14 +1,14 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from decimal import Decimal
 from datetime import date
 
 class StockPriceBase(BaseModel):
     stock_id: int
     date: date
-    open_price: float
-    high_price: float
-    low_price: float
-    close_price: float
+    open_price: Decimal
+    high_price: Decimal
+    low_price: Decimal
+    close_price: Decimal
     volume: int
 
     model_config = ConfigDict(from_attributes=True)

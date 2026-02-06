@@ -34,7 +34,7 @@ class TransactionCrud(BaseCrud):
             quantity = tx.quantity,
             price = tx.price,
             total_value = total_value,
-            
+            timestamp = tx.timestamp
         )
 
         try:
