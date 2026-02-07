@@ -14,8 +14,8 @@ export const PositionTable = async ({ positions }: {positions: PositionRead[]}) 
         {positions.map((p) => (
           <tr key={p.id}>
             <td>{p.symbol}</td>
-            <td>{p.quantity}</td>
-            <td>{p.buy_price}</td>
+            <td>{Number(p.quantity).toFixed(1)}</td>
+            <td>{Number(p.buy_price).toFixed(2)}</td>
           </tr>
         ))}
       </tbody>

@@ -4,7 +4,6 @@ import { getAccessToken } from "../api/auth/access_token"
 
 export const authRequest = async <T>(path: string, init?: RequestInit) => {
     const token = await getAccessToken()
-    console.log("THIS IS TOKEN", token);
     if (!token) {
         throw new Error("No access")
     }

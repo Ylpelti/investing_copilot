@@ -36,8 +36,7 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
             <h1>{portfolio.name}</h1>
             <PositionTable positions={positions}/>
 
-            <h1>Transactions</h1>
-            <TransactionList transactions={transactions} />
+            
 
             <PositionForm action={boundCreatePosition} />
         </div>

@@ -9,6 +9,7 @@ type TransactionBase = {
     type: TransactionType
     quantity: number
     price: number
+    timestamp: Date
 }
 
 export type TransactionRead = TransactionBase & {

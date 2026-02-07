@@ -1,3 +1,6 @@
+import z from "zod"
+import { PositionReadSchema } from "@/lib/schemas/position"
+
 type PositionBase = {
     symbol: string
     quantity: number
@@ -14,6 +17,4 @@ export type PositionFormData = {
 
 export type PositionCreate = PositionBase
 
-export type PositionRead = PositionBase & {
-    id: number
-}
+export type PositionRead = z.infer<typeof PositionReadSchema>

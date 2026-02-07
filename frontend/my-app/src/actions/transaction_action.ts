@@ -22,9 +22,17 @@ export async function createTransactionAction(
 ): Promise<CreatePositionState> {
   try {
     const stock_id = Number(formData.get("stock_id"))
+    const rawDate = formData.get("timestamp")
     const quantity = Number(formData.get("quantity"))
     const buy_price = Number(formData.get("buy_price"))
     const rawType = String(formData.get("type"))
+
+    if (typeof rawDate !== "string") {
+      throw new Error("Invalid date format")
+    }
+
+    const timestamp = new Date(rawDate)
+    
 
     if (!stock_id) throw new Error("Symbol is required")
     if (quantity <= 0) throw new Error("Quantity must be greater than 0")
@@ -45,7 +53,8 @@ export async function createTransactionAction(
       stock_id,
       type,
       quantity,
-      price: buy_price
+      price: buy_price,
+      timestamp
     }
     
     await createTransaction(payload)
