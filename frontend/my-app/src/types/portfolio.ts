@@ -15,5 +15,8 @@ export type PortfolioCreate = PortfolioBase & {
     user_id:number
 }
 
-
+export type PortfolioExplanation = {
+    portfolio_id: number
+    explanation: string
+}
 

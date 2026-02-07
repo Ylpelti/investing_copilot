@@ -1,6 +1,6 @@
 "use server"
 import { LoginForm } from "@/components/users/loginForm";
-import { loginAction } from "@/actions/user_actions";
+import { loginAction } from "@/actions/userActions";
 import Link from "next/link";
 
 

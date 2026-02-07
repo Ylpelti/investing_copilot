@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState } from "react"
-import type { CreateUserState } from "@/actions/user_actions"
+import type { CreateUserState } from "@/actions/userActions"
 
 type Props = {
   action: (

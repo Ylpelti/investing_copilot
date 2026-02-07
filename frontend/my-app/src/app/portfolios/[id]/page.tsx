@@ -3,11 +3,11 @@ import { PositionTable } from "@/components/positions/positionList"
 import { getPortfolioById } from "@/lib/api/portfolio"
 import { getPortfolioPositions } from "@/lib/api/position"
 import { getPortfolioTransactions } from "@/lib/api/transactions"
-import { TransactionList } from "@/components/portfolio/transactionList"
+import { PortfolioExplanation } from "@/components/portfolio/explainPortfolio"
 import { PositionForm } from "@/components/positions/positionForm"
 
 import { getCurrentUser } from "@/lib/api/auth/auth"
-import { createTransactionAction } from "@/actions/transaction_action"
+import { createTransactionAction } from "@/actions/transactionAction"
 
 
 type PageProps = {
@@ -35,10 +35,8 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
         <div>
             <h1>{portfolio.name}</h1>
             <PositionTable positions={positions}/>
-
-            
-
             <PositionForm action={boundCreatePosition} />
+            <PortfolioExplanation portfolioId={portfolioId}/>
         </div>
         
     )

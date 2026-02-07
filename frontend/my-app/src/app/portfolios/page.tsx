@@ -4,7 +4,7 @@ import { PortfolioForm } from "@/components/portfolio/portfolioForm"
 
 import { getCurrentUser } from "@/lib/mock/userMockData"
 import { getUserPortfolios } from "@/lib/api/portfolio"
-import { createPortfolioAction } from "@/actions/portfolio_actions"
+import { createPortfolioAction } from "@/actions/portfolio/portfolioActions"
 
 
 

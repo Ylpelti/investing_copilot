@@ -1,5 +1,5 @@
 import { RegisterForm } from "@/components/users/registerForm"
-import { createUserAction } from "@/actions/user_actions"
+import { createUserAction } from "@/actions/userActions"
 import Link from "next/link"
 
 const RegisterPage = () => {

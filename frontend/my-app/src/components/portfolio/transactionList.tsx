@@ -4,7 +4,7 @@ export const TransactionList = ({ transactions }: {transactions: TransactionRead
     return (
         <ul>
             {transactions.map(t => (
-                <li key={t.id}>{t.symbol}
+                <li key={t.id}>
                 {t.quantity}
                 {t.total_value}</li>
             ))}

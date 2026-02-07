@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import type { CreatePositionState } from "@/actions/transaction_action"
+import type { CreatePositionState } from "@/actions/transactionAction"
 import { StockSearch } from "../stock/search/stockSearch"
 import { StockOption } from "@/types/stock"
 
