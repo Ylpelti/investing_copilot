@@ -7,11 +7,13 @@ def transaction_to_df(tx: list[PortfolioTransaction]) -> pd.DataFrame:
     if not tx:
         return pd.DataFrame(columns=["date", "stock_id", "quantity", "price", "type"])
 
+
+        
     tx_df = pd.DataFrame([{
         "date": t.timestamp,
         "stock_id": t.stock_id,
-        "quantity": t.quantity,
-        "price": t.price,
+        "quantity": float(t.quantity),
+        "price": float(t.price),
         "type": t.type,
     } for t in tx])
 

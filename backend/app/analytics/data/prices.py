@@ -17,7 +17,7 @@ def prices_to_df(db, txs: List[PortfolioTransaction], forward_fill: bool = True)
     prices = crud.read_prices_bu_stock_ids_and_date(stock_ids, start_date, end_date)
 
     df = pd.DataFrame([
-        {"date":p.date, "stock_id": p.stock_id, "close": p.close_price} for p in prices
+        {"date":p.date, "stock_id": p.stock_id, "close": float(p.close_price)} for p in prices
     ])
 
     df = df.sort_values(by=["stock_id", "date"]).reset_index(drop=True)
