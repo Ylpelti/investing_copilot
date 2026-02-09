@@ -2,7 +2,7 @@ from app.crud.stock_prices_crud import StockPriceCrud
 from app.models.transaction import PortfolioTransaction
 import pandas as pd
 from typing import List
-from datetime import date
+from datetime import date, datetime
 
 def prices_to_df(db, txs: List[PortfolioTransaction], forward_fill: bool = True) -> pd.DataFrame:
     if not txs:
@@ -24,7 +24,12 @@ def prices_to_df(db, txs: List[PortfolioTransaction], forward_fill: bool = True)
 
     df = df.pivot(index="date", columns="stock_id", values="close").sort_index()
 
-    df.index = pd.to_datetime(df.index)
+    df.index = (
+    pd.to_datetime(df.index)
+      .tz_localize("UTC")
+      .normalize()
+)
+
     return df
 
 

@@ -32,7 +32,7 @@ def build_internal_and_external_flows(daily_trade_cash:pd.Series):
     cash = 0.0
 
     for delta in daily_trade_cash:
-        print(delta)
+        
         cash_raw = cash + delta
 
         if cash_raw < 0:

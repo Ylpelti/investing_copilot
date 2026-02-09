@@ -41,8 +41,14 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
 
     def build_core_series(self, tx, db):
         tx_df = self.load_tx_df(tx)
+        print("TX__df_________")
+        print(tx_df)
         prices_df = self.load_prices_df(db, tx)
+        print("Prices----------------")
+        print(prices_df)
         holdings_df = self.compute_holdings_df(tx_df, prices_df)
+        print("Holdings------------------------")
+        print(holdings_df)
         internal_cash, external_cf = self.compute_Cashflows(tx_df, prices_df)
         MV = self.compute_market_value(holdings_df, prices_df)
         NAV_r= self.compute_NAV_r(MV, internal_cash)

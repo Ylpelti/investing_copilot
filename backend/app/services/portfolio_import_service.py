@@ -6,6 +6,7 @@ from app.schemas.transactions import TransactionCreate
 from app.crud.stock_crud import StockCrud
 from app.core.errors.exceptions import NotFound
 from datetime import datetime
+from decimal import Decimal
 from app.models.transaction import TransactionType
 
 
@@ -28,7 +29,7 @@ def parse_csv(file: IO[str], portfolio_id: int, db, current_user_id:int):
         crud.ceate_transaction(transaction, current_user_id)        
         
 
-def normalize_transaction(isin:str, quantity: int, buy_price: int, trade_date:datetime, db, portfolio_id):
+def normalize_transaction(isin:str, quantity: Decimal, buy_price: Decimal, trade_date:datetime, db, portfolio_id):
     crud = StockCrud(db)
     stock = crud.get_stock_by_isin(isin)
     if not stock:
@@ -38,7 +39,6 @@ def normalize_transaction(isin:str, quantity: int, buy_price: int, trade_date:da
     return TransactionCreate(
          portfolio_id=portfolio_id,
          stock_id=stock.id,
-         symbol=stock.ticker,
          type=TransactionType.BUY,
          quantity=quantity,
          price=buy_price,
