@@ -5,17 +5,26 @@ def build_holdings_df(txs_df: pd.DataFrame, prices_df: pd.DataFrame) -> pd.DataF
     tx_df = txs_df.copy()
     if tx_df.empty:
         return pd.DataFrame()
-
-    tx_df["signed_qty"] = tx_df.apply(
-        lambda x: x["quantity"] if x["type"].upper() == "BUY" else -x["quantity"], axis=1
+    
+    tx_df["side"] = tx_df["type"].apply(
+        lambda t: t.name if hasattr(t, "name") else str(t).split(".")[-1]
     )
+    
+    tx_df["signed_qty"] = tx_df.apply(
+        lambda x: x["quantity"] if x["side"] == "BUY" else -x["quantity"], axis=1
+    )
+    #normalize both timestamps
+    tx_df["date"] = pd.to_datetime(tx_df["date"], utc=True).dt.normalize()
+    
+    
+    
     daily_tx = (
         tx_df.groupby(["date", "stock_id"])["signed_qty"]
         .sum()
         .unstack(fill_value=0)
         .sort_index()
     )
-
+    print(daily_tx)
     all_dates = prices_df.index
     daily_tx = daily_tx.reindex(all_dates, fill_value=0)
     holdings_df = daily_tx.cumsum()
