@@ -7,5 +7,12 @@ class PortfolioExplanationService:
         self.ai_explainer = ai_explainer
 
     def explain_portfolio(self, txs, db):
-        analytics_results = self.analytics_engine.compute(txs, db)
-        return self.ai_explainer.explain(analytics_results, kind="portfolio_summary")
+        result = self.analytics_engine.compute(txs, db)
+        payload = {
+            "nav": result.nav,
+            "simple return": result.simple_ret,
+            "cumumulative returns": result.cum_ret,
+            "logarithmic returns": result.log_ret,
+            "risks": result.risk
+        }
+        return self.ai_explainer.explain(payload, kind="portfolio_summary")

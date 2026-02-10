@@ -6,6 +6,7 @@ from app.analytics.portfolio.NAV_r import build_NAV_r
 from app.analytics.models.returns import simple_returns, cumulative_returns, log_returns
 from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility, var_cvar
 from app.analytics.utils.series_to_records import series_to_records
+from app.analytics.engine.result import PortfolioAnalyticsResult
 import matplotlib.pyplot as plt
 from app.analytics.models.performance import sharpe_ratio
 
@@ -18,26 +19,17 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
     def __init__(self, config):
         super().__init__(config)
 
-    def compute(self, tx, db):
+    def compute(self, tx, db) -> PortfolioAnalyticsResult:
         tx_df, prices_df, holdings_df, NAV_r, simple_returns, cum_returns, log_returns, internal_cash, external_cash = self.build_core_series(tx, db)
         risk = self.compute_risk_metrics(NAV_r, simple_returns)
 
-        return {
-            "data": {
-                "transaction dataframe": tx_df,
-                "prices df": prices_df,
-                "holdings df": holdings_df,
-                "NAV": NAV_r
-            },
-
-            "returns": {
-                "simple return": simple_returns,
-                "cumulative returns": cum_returns,
-                "log returns": log_returns
-
-            }, 
-            "risk": risk
-        }
+        return PortfolioAnalyticsResult(
+            nav=NAV_r,
+            simple_ret=simple_returns,
+            cum_ret=cum_returns,
+            log_ret=log_returns,
+            risk=risk
+        )
 
     def build_core_series(self, tx, db):
         tx_df = self.load_tx_df(tx)

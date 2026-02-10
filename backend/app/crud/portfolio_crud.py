@@ -65,6 +65,10 @@ class PortfolioCrud(BaseCrud[Portfolio]):
         self.delete_by_id(portfolio.id)
         logger.info(f"portofolio with id {portfolio.id} deleted")
         return True
+    
+    def get_portfolio_valueseries(self, portfolio_id: int, current_user_id: int):
+        portfolio = self.get_owned_portfolio(portfolio_id, current_user_id)
+        
 
 
             

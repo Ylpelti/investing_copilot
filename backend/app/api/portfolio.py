@@ -14,6 +14,7 @@ from app.api.dependencies import get_portfolio_explanation_service
 from typing import List
 from app.crud.position_crud import PositionCrud
 from app.schemas.positio import PositionRead
+from app.analytics.engine.portfolio_engine import PortfolioAnalyticsEngine
 
 router = APIRouter(
         prefix="/portfolios",
@@ -89,6 +90,10 @@ def get_portfolio_positions(
 ):
     position_crud = PositionCrud(db)
     return position_crud.get_portfolio_positions(portfolio_id, current_user.id)
+
+@router.get("/{portfolio_id}/charts")
+def get_portfolio_timeseries(portfolio_id:int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    portfolio_crud = PortfolioCrud(db)
 
     
 
