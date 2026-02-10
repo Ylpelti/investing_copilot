@@ -8,3 +8,7 @@ class PortfolioAnalyticsService:
     def calculate_nav(self, txs, db):
         result = self.analytics_engine.compute(txs, db)
         return result.nav
+    
+    def calculate_simple_ret(self, txs, db):
+        result = self.analytics_engine.compute(txs, db)
+        return result.simple_ret
