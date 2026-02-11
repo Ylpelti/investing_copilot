@@ -13,6 +13,6 @@ class PortfolioExplanationService:
             "simple return": result.simple_ret,
             "cumumulative returns": result.cum_ret,
             "logarithmic returns": result.log_ret,
-            "risks": result.risk
+            "risk": result.risk
         }
         return self.ai_explainer.explain(payload, kind="portfolio_summary")

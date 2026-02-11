@@ -44,6 +44,8 @@ class PortfolioAnalyticsEngine(BaseAnalyticsEngine):
         internal_cash, external_cf = self.compute_Cashflows(tx_df, prices_df)
         MV = self.compute_market_value(holdings_df, prices_df)
         NAV_r= self.compute_NAV_r(MV, internal_cash)
+        print("NAV--------------------")
+        print(NAV_r)
         simple_returns = self.compute_portfolio_returns(NAV_r, external_cf)
         cum_returns = self.compute_cumulative_returns(simple_returns)
         log_returns = self.compute_log_returns(simple_returns)
