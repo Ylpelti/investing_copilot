@@ -4,8 +4,8 @@ from typing import Dict, Any
 class PortfolioContextBuilder(BaseContext):
 
     def build(self, analytic_result: Dict[str, Any]):
-        nav = analytic_result["data"]["NAV"]
-        returns = analytic_result["returns"]["simple return"]
+        nav = analytic_result["nav"]
+        returns = analytic_result["simple return"]
 
         return {
             "start_value": float(nav.iloc[0]),
