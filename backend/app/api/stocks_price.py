@@ -29,3 +29,8 @@ def read_stock_prices_by_ticker(ticker: str, db: Session = Depends(get_db)):
 def read_stock_prices_by_date_range(stock_id: int, start_date: str, end_date: str, db: Session = Depends(get_db)):
     crud = StockPriceCrud(db)
     return crud.read_stock_prices_by_date_range(stock_id, start_date, end_date)
+
+@router.get("/by_date/{stock_id}", response_model=StockPriceRead)
+def read_stock_price_by_date(stock_id: int, date: str, db: Session = Depends(get_db)):
+    crud = StockPriceCrud(db)
+    return crud.read_stock_price_by_date(stock_id, date)
