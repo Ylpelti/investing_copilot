@@ -67,3 +67,7 @@ class StockPriceCrud(BaseCrud):
             raise NotFound(message=f"Didn't find any stocks with ids {stock_ids}")
         
         return result
+
+    def read_stock_price_by_date(self, stock_id: int, date: str):
+        return self.db.query(StockPrice).filter(StockPrice.stock_id == stock_id, StockPrice.date == date)
+    

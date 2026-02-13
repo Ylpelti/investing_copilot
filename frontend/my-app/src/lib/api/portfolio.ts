@@ -1,6 +1,7 @@
 import { PortfolioRead, PortfolioCreate, PortfolioExplanation } from "@/types/portfolio"
 import { apiRequest } from "../requests/http"
 import { authRequest } from "../requests/authRequest"
+import { ChartData } from "@/types/chartData"
 
 
 export const getUserPortfolios = async (): Promise<PortfolioRead[]> => {
@@ -28,5 +29,11 @@ export const createPortfolio = async (data: PortfolioCreate): Promise<PortfolioR
 export const explainPortfolio = async (portfolio_id: number): Promise<PortfolioExplanation> => {
     return authRequest(`/portfolios/${portfolio_id}/explain`, {
         method: "POST"
+    })
+}
+
+export const getPortfolioTimeserie = async (portfolio_id: number): Promise<ChartData[]> => {
+    return authRequest(`/portfolio/${portfolio_id}/timeseries`, {
+        method: "GET"
     })
 }
