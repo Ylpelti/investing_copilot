@@ -44,7 +44,7 @@ def get_stock_prices(
 ):
     return stock_price_service.get_prices(stock_id, start, end, limit, order)
 
-@router.get("/{stock_id}/latest-price", response_model=StockPriceRead)
+@router.get("/{stock_id}/prices/latest", response_model=StockPriceRead)
 def get_latest_stock_price(
     stock_id: Annotated[int, Path(gt=0)],
     stock_price_service: StockPriceService = Depends(get_stock_price_service)
