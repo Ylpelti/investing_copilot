@@ -2,7 +2,7 @@ import io
 import pytest
 from app.core.errors.exceptions import NotFound, Forbidden, BadRequest
 import pandas as pd
-from app.services.portfolio_import_service import parse_csv
+from app.services.portfolio.portfolio_import_service import parse_csv
 from app.models.positio import Position
 from app.crud.portfolio_crud import PortfolioCrud
 from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate

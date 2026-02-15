@@ -8,14 +8,14 @@ from app.crud.portfolio_crud import PortfolioCrud
 from app.crud.transaction_crud import TransactionCrud
 from fastapi import UploadFile
 from app.security.dependencies import get_current_user
-from app.services.portfolio_import_service import parse_csv
-from app.services.portfolio_explanation_service import PortfolioExplanationService
+from app.services.portfolio.portfolio_import_service import parse_csv
+from app.services.portfolio.portfolio_explanation_service import PortfolioExplanationService
 from app.services.dependencies import get_portfolio_explanation_service
 from typing import List
 from app.crud.position_crud import PositionCrud
 from app.schemas.positio import PositionRead
 from app.services.dependencies import get_portfolio_analytics_service
-from app.services.portfolio_analytics_service import PortfolioAnalyticsService
+from app.services.portfolio.portfolio_analytics_service import PortfolioAnalyticsService
 from app.core.utils.series_to_records import series_to_record
 
 

@@ -28,7 +28,7 @@ from app.schemas.portfolio import PortfolioCreate
 from app.schemas.stock import StockCreate
 from app.analytics.engine.portfolio_engine import PortfolioAnalyticsEngine
 from app.analytics.engine.config import EngineConfig
-from app.services.portfolio_explanation_service import PortfolioExplanationService
+from app.services.portfolio.portfolio_explanation_service import PortfolioExplanationService
 from app.ai.services.ai_explainer import AiExplainerService
 from app.core.config import settings
 
