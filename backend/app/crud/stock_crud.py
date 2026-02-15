@@ -60,11 +60,38 @@ class StockCrud(BaseCrud):
             raise NotFound(message=f"Not found with ticker: {ticker}")
         return stock
     
-    def search_stock_by_ticker(self, query:str, limit: int = 5) -> list[Stock]:
-        q = query.strip().upper()
+    def list_or_search(
+            self,
+            q: str | None,
+            limit: int,
+            offset: int
+    ) -> list[Stock]:
+        query = self.db.query(Stock)
 
-        if not q:
+        if q:
+            search_term = f"%{q}%"
+            query = query.filter(
+                or_(
+                    Stock.ticker.ilike(search_term),
+                    Stock.name.ilike(search_term)
+                )
+            )
+        return (
+            query
+            .order_by(Stock.ticker.asc())
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+           
+    
+    def search_stock_by_ticker(self, query:str | None = None, limit: int = 5) -> list[Stock]:
+        
+
+        if not query:
             return []
+        
+        q = query.strip().upper()
         return (
             self.db.query(Stock)
             .filter(
