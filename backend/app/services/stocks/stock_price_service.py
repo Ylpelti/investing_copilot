@@ -30,7 +30,7 @@ class StockPriceService:
         return self.stock_price_repo.get_prices(stock_id, start, end, limit, order)
     
     def get_latest_price(self, stock_id: int):
-        stock = self.stock_repo.get_by_id(stock_id):
+        stock = self.stock_repo.get_by_id(stock_id)
         if not stock:
             raise NotFound(message="Not found stock")
         

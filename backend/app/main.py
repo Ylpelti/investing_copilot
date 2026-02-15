@@ -1,13 +1,9 @@
 from fastapi import FastAPI
-from app.api.v1.routers import portfolio, positio, stocks, stocks_price, token, transactions
 from app.db.session import engine, Base
-from app.api.v1.routers import users
-
 from app.api.v1.api import api_router as api_v1_router
 from app.db.session import SessionLocal
 from app.services.stock_service import fetch_and_store_stocks
 from app.services.stock_price_service import fetch_and_store_stock_price
-from datetime import date
 from app.core.errors.errorhandler import app_error_handler, generic_exception_handler
 from app.core.errors.exceptions import AppError
 from fastapi.middleware.cors import CORSMiddleware
