@@ -1,4 +1,3 @@
-
 import pandas as pd
 from typing import IO
 from app.crud.transaction_crud import TransactionCrud
@@ -8,10 +7,25 @@ from app.core.errors.exceptions import NotFound
 from datetime import datetime
 from decimal import Decimal
 from app.models.transaction import TransactionType
+from app.infrastructure.parsers.base_parser import BaseParser
+from app.services.portfolio.portfolio_service import PortfolioService
+from app.services.stocks.stock_service import StockService
 
 
 
+class PortfolioImportService:
+    def __init__(self, tx_repo, portfolio_service: PortfolioService, stock_service: StockService, current_user_id, parser: BaseParser):
+        self.tx_repo = tx_repo
+        self.portfolio_service = portfolio_service
+        self.stock_service = stock_service
+        self.current_user_id = current_user_id
+        self.parser = parser
 
+    def import_csv(self, file: IO, portfolio_id):
+        portfolio = self.portfolio_service.get_owned_portfolio_or_404(portfolio_id)
+        dtos = self.parser.parse(file)
+    
+    
 
 
 
