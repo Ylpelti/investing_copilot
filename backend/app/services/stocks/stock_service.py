@@ -24,3 +24,6 @@ class StockService:
     
     def get_stock_by_ticker(self, ticker:str):
         return self.stock_repo.get_stock_by_ticker(ticker)
+    
+    def get_stock_by_isin(self, isin:str):
+        return self.stock_repo.get_stock_by_isin(isin)

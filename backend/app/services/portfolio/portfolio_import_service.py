@@ -10,6 +10,7 @@ from app.models.transaction import TransactionType
 from app.infrastructure.parsers.base_parser import BaseParser
 from app.services.portfolio.portfolio_service import PortfolioService
 from app.services.stocks.stock_service import StockService
+from app.dto.transaction_dto import NormalizedTransactionDTO
 
 
 
@@ -21,26 +22,30 @@ class PortfolioImportService:
         self.current_user_id = current_user_id
         self.parser = parser
 
-    def import_csv(self, file: IO, portfolio_id):
-        portfolio = self.portfolio_service.get_owned_portfolio_or_404(portfolio_id)
+    def import_csv(self, file: IO, portfolio_id: int):
+        self.portfolio_service.get_owned_portfolio_or_404(portfolio_id)
         dtos = self.parser.parse(file)
+
+    def normalize_transactionCreate(self, dtos: list[NormalizedTransactionDTO], portfolio_id: int):
+        result = []
+        for dto in dtos:
+            stock = self.stock_service.get_stock_by_isin(dto.isin)
+            tx = TransactionCreate(
+                portfolio_id=portfolio_id,
+                stock_id=stock.id, #type: ignore
+                type = TransactionType.BUY,
+                quantity=dto.quantity,
+                price = dto.buy_price,
+                timestamp=dto.date
+            )
+            result.append(tx)
+        return result
     
     
 
 
 
-def parse_csv(file: IO[str], portfolio_id: int, db, current_user_id:int):
-    crud = TransactionCrud(db)
-    df = pd.read_csv(file, encoding='utf-16', sep='\t', decimal=',')
-    for _,row in df.iterrows():
-        quantity = row['Määrä']
-        isin = row['ISIN']
-        buy_price = row["Hankinta-arvo (Noteerausvaluutta)"]
-        trade_date = pd.to_datetime(row["Hankintapäivä"], format="%d.%m.%Y", errors="coerce")
-        transaction = normalize_transaction(isin, quantity, buy_price, trade_date, db, portfolio_id)
-        if not transaction:
-            continue
-        crud.ceate_transaction(transaction, current_user_id)        
+    
         
 
 def normalize_transaction(isin:str, quantity: Decimal, buy_price: Decimal, trade_date:datetime, db, portfolio_id):

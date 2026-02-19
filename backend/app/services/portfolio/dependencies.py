@@ -32,21 +32,22 @@ def get_portfolio_analytics_service() -> PortfolioAnalyticsService:
     return PortfolioAnalyticsService(engine) 
 
 
-def get_portfolio_import_service(
-        provider: str, 
-        db: Session = Depends(get_db), 
-        current_user: User = Depends(get_current_user)
-        
-) -> PortfolioImportService: 
-    tx_repo = TransactionCrud(db)
-    portfolio_service = Depends(get_portfolio_services)
-    stock_service = Depends(get_stock_service)
-    parser = get_provider_parser(provider)
-    return PortfolioImportService(tx_repo, portfolio_service, stock_service, current_user.id, parser)
-
 def get_portfolio_services(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ) -> PortfolioService:
     portfolio_repo = PortfolioCrud(db)
     return PortfolioService(current_user.id, portfolio_repo)
+
+def get_portfolio_import_service(
+        provider: str, 
+        db: Session = Depends(get_db), 
+        current_user: User = Depends(get_current_user),
+        portfolio_service: PortfolioService = Depends(get_portfolio_services), 
+        stock_service = Depends(get_stock_service)
+        
+) -> PortfolioImportService: 
+    tx_repo = TransactionCrud(db)
+    parser = get_provider_parser(provider)
+    return PortfolioImportService(tx_repo, portfolio_service, stock_service, current_user.id, parser)
+
