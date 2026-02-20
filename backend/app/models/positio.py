@@ -13,11 +13,10 @@ if TYPE_CHECKING:
 
 class Position(Base):
     __tablename__ = "positions"
-    __table_args__ = (UniqueConstraint("portfolio_id", "symbol", name="uq_portfolio_symbol"),)
+    __table_args__ = (UniqueConstraint("portfolio_id", "stock_id", name="uq_portfolio_symbol"),)
 
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    symbol: Mapped[str] = mapped_column(String(16), nullable=False)
     quantity: Mapped[Decimal] = mapped_column(Numeric(18, 6), nullable=False)
     buy_price: Mapped[Optional[Decimal]] = mapped_column(Numeric(18, 6), nullable=True)
 
@@ -34,8 +33,8 @@ class Position(Base):
         onupdate=func.now(),
         nullable=True)
 
-    stock_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("stocks.id", ondelete="SET NULL"), nullable=True)
+    stock_id: Mapped[int] = mapped_column(Integer, ForeignKey("stocks.id", ondelete="CASCADE"), nullable=False)
     stock: Mapped[Optional["Stock"]] = relationship("Stock", back_populates="positions")
 
     def __repr__(self):
-        return f"<Position id={self.id}, portfolio={self.portfolio_id}, symbol={self.symbol}, qty={self.quantity}>"
+        return f"<Position id={self.id}, portfolio={self.portfolio_id}, qty={self.quantity}>"

@@ -29,11 +29,8 @@ class PositionCrud(BaseCrud):
               .first()
         )
 
-    def create_position(self, data: PositionCreate) -> Position:
-        db_position = Position(
-            stock_id = data.stock_id,
-
-        )
+    def create_position(self, position: Position) -> Position:
+        return self.db.add(position)
 
     def create_or_update_on_buy(self, portfolio_id: int, tx: TransactionCreate, stock: Stock) -> Position:
         position = (
