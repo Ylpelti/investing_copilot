@@ -17,6 +17,24 @@ logger = logging.getLogger(__name__)
 class PositionCrud(BaseCrud):
     model = Position
 
+
+
+    def get_by_portfolio_and_stock(self, portfolio_id: int, stock_id: int) -> Position | None:
+        return (
+              self.db.query(Position)
+              .filter(
+                  Position.portfolio_id == portfolio_id,
+                  Position.stock_id == stock_id
+              )
+              .first()
+        )
+
+    def create_position(self, data: PositionCreate) -> Position:
+        db_position = Position(
+            stock_id = data.stock_id,
+
+        )
+
     def create_or_update_on_buy(self, portfolio_id: int, tx: TransactionCreate, stock: Stock) -> Position:
         position = (
             self.db.query(Position)

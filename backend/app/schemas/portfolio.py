@@ -10,7 +10,7 @@ class PortfolioBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class PortfolioCreate(PortfolioBase):
-    user_id: int
+    pass
 
 class PortfolioRead(PortfolioBase):
     id: int

@@ -5,13 +5,14 @@ from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
 from app.crud.base_crud import BaseCrud
 from typing import List
 from app.core.errors.exceptions import NotFound, Forbidden, BadRequest
+from app.dto.portfolio_dto import PortfolioInternal
 
 logger = logging.getLogger(__name__)
 
 class PortfolioCrud(BaseCrud[Portfolio]):
     model = Portfolio
 
-    def create_portfolio(self, portfolio:PortfolioCreate) -> Portfolio:
+    def create_portfolio(self, portfolio:PortfolioInternal) -> Portfolio:
         db_portfolio = Portfolio(
            name = portfolio.name,
            description=portfolio.description,

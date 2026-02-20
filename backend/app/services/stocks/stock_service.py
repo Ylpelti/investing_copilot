@@ -1,6 +1,7 @@
 from app.crud.stock_crud import StockCrud
 from app.schemas.stock import StockCreate
-from app.core.errors.exceptions import DuplicateStockError
+from app.core.errors.exceptions import DuplicateStockError, NotFound
+from app.models.stock import Stock
 
 class StockService:
     def __init__(
@@ -16,8 +17,12 @@ class StockService:
             raise DuplicateStockError()
         return self.stock_repo.create_stock(stock)
 
-    def get_stock_by_id(self, stock_id:int):
-        return self.stock_repo.get_by_id(stock_id)
+    def get_stock_by_id_or_404(self, stock_id:int) -> Stock:
+
+        stock = self.stock_repo.get_by_id(stock_id) 
+        if not stock:
+            raise NotFound(message="Stock not found")
+        return stock
     
     def list_stocks(self, q, limit, offset):
         return self.stock_repo.list_or_search(q, limit, offset)
