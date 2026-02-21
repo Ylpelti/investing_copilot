@@ -22,10 +22,6 @@ class PositionService:
             raise BadRequest(message="invalid transaction type")
         handler(position, tx)
 
-
-
-        
-        
     def _apply_buy(self, position: Position | None, tx:PortfolioTransaction):
         if position:
             new_total_quantity = position.quantity + tx.quantity
@@ -41,7 +37,7 @@ class PositionService:
                 quantity=tx.quantity,
                 buy_price=tx.price,
             )
-            self.position_repo.create_position(new_position)
+            self.position_repo.add_position(new_position)
 
     def _apply_sell(self, position: Position | None, tx:PortfolioTransaction):
         if not position:

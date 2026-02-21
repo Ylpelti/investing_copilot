@@ -9,7 +9,7 @@ from app.dto.portfolio_dto import PortfolioInternal
 
 logger = logging.getLogger(__name__)
 
-class PortfolioCrud(BaseCrud[Portfolio]):
+class PortfolioCrud(BaseCrud):
     model = Portfolio
 
     def create_portfolio(self, portfolio:PortfolioInternal) -> Portfolio:
@@ -31,10 +31,14 @@ class PortfolioCrud(BaseCrud[Portfolio]):
                 Portfolio.user_id == user_id
             ).first()
             )
-        if not portfolio:
-            raise Forbidden(message="No portfolio found")
-        
         return portfolio
+    
+    def get_by_id(self, portfolio_id:int) -> Portfolio | None:
+        return (
+            self.db.query(Portfolio)
+            .filter(Portfolio.id == portfolio_id)
+            .first()
+        )
     
     def get_user_owned_portfolios(self, user_id):
         portfolios = (

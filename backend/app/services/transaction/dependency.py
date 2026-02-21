@@ -14,15 +14,15 @@ from app.services.stocks.stock_service import StockService
 
 def get_transaction_service(
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user),
         position_service: PositionService = Depends(get_position_service),
         portfolio_service: PortfolioService = Depends(get_portfolio_services),
         stock_service: StockService = Depends(get_stock_service),
 ):
     tx_repo = TransactionCrud(db)
     return TransactionService(
+        db,
         tx_repo,
         position_service,
         portfolio_service,
         stock_service,
-        current_user.id)
+        )
