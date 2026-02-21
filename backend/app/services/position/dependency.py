@@ -8,7 +8,7 @@ from app.crud.position_crud import PositionCrud
 
 def get_position_service(
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        
 ) -> PositionService:
     position_repo = PositionCrud(db)
-    return PositionService(position_repo, current_user.id)
+    return PositionService(position_repo)

@@ -5,9 +5,9 @@ from app.core.errors.exceptions import BadRequest
 
 
 class PositionService:
-    def __init__(self, position_repo: PositionCrud, current_user_id: int):
+    def __init__(self, position_repo: PositionCrud):
         self.position_repo = position_repo
-        self.current_user_id = current_user_id
+        
     
 
     def apply_transaction(self, tx:PortfolioTransaction):
@@ -37,7 +37,7 @@ class PositionService:
                 quantity=tx.quantity,
                 buy_price=tx.price,
             )
-            self.position_repo.add_position(new_position)
+            self.position_repo.add(new_position)
 
     def _apply_sell(self, position: Position | None, tx:PortfolioTransaction):
         if not position:
