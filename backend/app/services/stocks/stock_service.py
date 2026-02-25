@@ -18,7 +18,6 @@ class StockService:
         return self.stock_repo.create_stock(stock)
 
     def get_stock_by_id_or_404(self, stock_id:int) -> Stock:
-
         stock = self.stock_repo.get_by_id(stock_id) 
         if not stock:
             raise NotFound(message="Stock not found")

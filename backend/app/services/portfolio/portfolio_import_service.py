@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import IO
+from typing import IO, BinaryIO
 from app.crud.transaction_crud import TransactionCrud
 from app.schemas.transactions import TransactionCreate
 from app.crud.stock_crud import StockCrud
@@ -22,9 +22,10 @@ class PortfolioImportService:
         self.current_user_id = current_user_id
         self.parser = parser
 
-    def import_csv(self, file: IO, portfolio_id: int):
+    def import_csv(self, file: BinaryIO, portfolio_id: int):
         self.portfolio_service.get_owned_portfolio_or_404(portfolio_id)
         dtos = self.parser.parse(file)
+        return self.normalize_transactionCreate(dtos, portfolio_id)
 
     def normalize_transactionCreate(self, dtos: list[NormalizedTransactionDTO], portfolio_id: int):
         result = []

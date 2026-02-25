@@ -49,7 +49,7 @@ class PositionService:
         position.quantity -= tx.quantity
 
         if position.quantity == 0:
-            self.position_repo.delete_by_id(position.id)
+            self.position_repo.delete(position)
         
         
 

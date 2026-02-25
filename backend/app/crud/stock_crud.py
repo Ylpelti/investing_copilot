@@ -86,8 +86,6 @@ class StockCrud(BaseCrud):
            
     
     def search_stock_by_ticker(self, query:str | None = None, limit: int = 5) -> list[Stock]:
-        
-
         if not query:
             return []
         

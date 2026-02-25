@@ -17,20 +17,9 @@ from app.services.portfolio.portfolio_analytics_service import PortfolioAnalytic
 from app.infrastructure.parsers.factory import get_provider_parser
 from app.services.portfolio.portfolio_service import PortfolioService
 from app.services.stocks.dependencies import get_stock_service
+from app.services.transaction.transaction_service import TransactionService
+from app.services.transaction.dependency import get_transaction_service
 
-def get_portfolio_explanation_service(
-    ai_explainer: AiExplainerService = Depends(get_ai_service),
-) -> PortfolioExplanationService:
-    analytics_engine = PortfolioAnalyticsEngine(EngineConfig())
-
-    return PortfolioExplanationService(
-        analytics_engine=analytics_engine,
-        ai_explainer=ai_explainer,
-    )
-
-def get_portfolio_analytics_service() -> PortfolioAnalyticsService:
-    engine = PortfolioAnalyticsEngine(EngineConfig())
-    return PortfolioAnalyticsService(engine) 
 
 def get_portfolio_services(
         db: Session = Depends(get_db),
@@ -38,7 +27,7 @@ def get_portfolio_services(
 ) -> PortfolioService:
     portfolio_repo = PortfolioCrud(db)
     position_repo = PositionCrud(db)
-    return PortfolioService(current_user.id, portfolio_repo, position_repo)
+    return PortfolioService(db, current_user.id, portfolio_repo, position_repo)
 
 def get_portfolio_import_service(
         provider: str, 
@@ -52,3 +41,24 @@ def get_portfolio_import_service(
     parser = get_provider_parser(provider)
     return PortfolioImportService(tx_repo, portfolio_service, stock_service, current_user.id, parser)
 
+def get_portfolio_analytics_service(
+        tx_service: TransactionService = Depends(get_transaction_service),
+        db: Session = Depends(get_db)
+) -> PortfolioAnalyticsService:
+    engine = PortfolioAnalyticsEngine(EngineConfig())
+    return PortfolioAnalyticsService(engine, tx_service, db) 
+
+
+def get_portfolio_explanation_service(
+    ai_explainer: AiExplainerService = Depends(get_ai_service),
+    db:Session = Depends(get_db),
+    tx_service: TransactionService = Depends(get_transaction_service)
+) -> PortfolioExplanationService:
+    analytics_engine = PortfolioAnalyticsEngine(EngineConfig())
+
+    return PortfolioExplanationService(
+        analytics_engine=analytics_engine,
+        ai_explainer=ai_explainer,
+        db = db,
+        tx_service = tx_service
+    )
