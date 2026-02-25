@@ -181,7 +181,8 @@ def test_build_holdings_df_aligns_to_price_dates():
                 "2024-02-10",
                 "2024-02-25",
                 "2024-03-15",
-            ]
+            ],
+            utc=True,
         ),
     )
 

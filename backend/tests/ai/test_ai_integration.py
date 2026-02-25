@@ -1,5 +1,6 @@
 import pytest
 from openai import OpenAI
+from openai import APIConnectionError
 
 from app.ai.adapters.openai_adapter import OpenAIAdapater
 from app.ai.context.portfolio_context import PortfolioContextBuilder
@@ -16,8 +17,8 @@ def test_ai_pipeline_real_openai_call():
         pytest.skip("OPENAI_API_KEY not set")
 
     analytics_results = {
-        "data": {"NAV": pd.DataFrame([100, 110])},
-        "returns": {"simple return": pd.Series([0.10])},
+        "nav": pd.Series([100, 110]),
+        "simple return": pd.Series([0.10]),
         "risk": {
             "max drawdown": 0.05,
             "volatility": 0.2,
@@ -35,7 +36,10 @@ def test_ai_pipeline_real_openai_call():
         validator=BasicValidation(),
     )
 
-    result = pipeline.run(analytics_results)
+    try:
+        result = pipeline.run(analytics_results)
+    except APIConnectionError:
+        pytest.skip("OpenAI endpoint not reachable in current environment")
     print()
     print("-" * 20)
     print("AI output:", result)
