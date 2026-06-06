@@ -10,7 +10,7 @@ from app.schemas.token import TokenResponse
 
 router = APIRouter(prefix="/token", tags=["token"])
 
-@router.post("", response_model=TokenResponse)
+@router.post("/", response_model=TokenResponse)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     crud = UserCrud(db)
     user = crud.get_user_by_username(form_data.username)

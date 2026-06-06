@@ -2,6 +2,8 @@ from datetime import date
 from app.crud.stock_prices_crud import StockPriceCrud
 from app.crud.stock_crud import StockCrud
 from app.core.errors.exceptions import NotFound, BadRequest
+from app.dto.stock_price_dto import ExternalStockPriceDTO
+from app.models.stock_price import StockPrice
 
 
 
@@ -38,3 +40,20 @@ class StockPriceService:
         if not latest:
             raise NotFound(message="Not found latest price")
         return latest
+    
+    def add_price_if_missing(self, stock_id: int, dto: ExternalStockPriceDTO):
+        existing = self.stock_price_repo.get_by_id_and_date(stock_id, dto.date)
+        if existing:
+            return
+
+        price = StockPrice(
+            stock_id=stock_id,
+            date=dto.date,
+            open_price=dto.open_price,
+            high_price=dto.high_price,
+            low_price=dto.low_price,
+            close_price=dto.close_price,
+            volume=dto.volume,
+        )
+
+        self.stock_price_repo.add(price)

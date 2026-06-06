@@ -51,17 +51,19 @@ def get_latest_stock_price(
 ):
     return stock_price_service.get_latest_price(stock_id)
 
+@router.get("/by-ticker/{ticker}", response_model=StockRead)
+def read_stock_by_ticker(
+    ticker: str,
+    stock_service: StockService = Depends(get_stock_service)):
+    return stock_service.get_stock_by_ticker(ticker)
+
+
 @router.get("/{stock_id}", response_model=StockRead)
 def read_stock_by_id(
     stock_id: int,
     stock_service: StockService = Depends(get_stock_service)):
     return stock_service.get_stock_by_id_or_404(stock_id)
 
-@router.get("/by-ticker/{ticker}", response_model=StockRead)
-def read_stock_by_ticker(
-    ticker: str,
-    stock_service: StockService = Depends(get_stock_service)):
-    return stock_service.get_stock_by_ticker(ticker)
 
 
 

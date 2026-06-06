@@ -1,12 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
+from decimal import Decimal
 
 class StockBase(BaseModel):
     ticker: str
-    isin: Optional[str] = None
-    name: Optional[str] = None
-    close_price: float
+    isin: str
+    name: str
+    close_price: Decimal
     sector: Optional[str] = None
     updated_at: Optional[datetime] = None
 

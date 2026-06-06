@@ -5,6 +5,8 @@ from app.dto.portfolio_dto import PortfolioInternal
 from app.crud.position_crud import PositionCrud
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from app.schemas.positio import PositionRead
+from app.models.positio import Position
 
 class PortfolioService:
     def __init__(
@@ -71,3 +73,20 @@ class PortfolioService:
         portfolio = self.get_owned_portfolio_or_404(portfolio_id)
         return self.position_repo.list_by_portfolio_id(portfolio.id)
     
+    def get_portfolio_positions_read(self, portfolio_id: int) -> list[PositionRead]:
+        portfolio = self.get_owned_portfolio_or_404(portfolio_id)
+        positions = self.position_repo.list_by_portfolio_id(portfolio.id)
+        return [self._position_to_read(p) for p in positions]
+
+
+    def _position_to_read(self, position: Position) -> PositionRead:
+        if position.stock is None:
+            raise BadRequest(message="Position has not loaded stock relationship")
+        return PositionRead(
+            symbol=position.stock.ticker,
+            quantity=position.quantity,
+            portfolio_id=position.portfolio_id,
+            stock_id=position.stock_id,
+            buy_price=position.buy_price,
+            id=position.id
+        )

@@ -2,12 +2,13 @@ from fastapi import FastAPI
 from app.db.session import engine, Base
 from app.api.v1.api import api_router as api_v1_router
 from app.db.session import SessionLocal
-from app.services.stock_service import fetch_and_store_stocks
-from app.services.stock_price_service import fetch_and_store_stock_price
+from app.services.stocks.dependencies import build_stock_price_sync_service, build_stock_sync_service
 from app.core.errors.errorhandler import app_error_handler, generic_exception_handler
 from app.core.errors.exceptions import AppError
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.stock import Stock
+from app.json.ticker_map import load_ticker_map
+
 
 origins = [
     "https://localhost:3000"
@@ -35,11 +36,14 @@ app.include_router(api_v1_router, prefix="/api/v1")
 @app.on_event("startup")
 def startup_event():
     db = SessionLocal()
-    db = SessionLocal()
     try:
         if not db.query(Stock).first():
-            fetch_and_store_stocks(db)
-            fetch_and_store_stock_price(db)
+            ticker_map = load_ticker_map()
+            stock_sync = build_stock_sync_service(db)
+            stock_price_sync = build_stock_price_sync_service(db)
+            stock_sync.sync_from_mapping(ticker_map)
+            stock_price_sync.sync_all()
+            
             print("Database initialized with stock data.")
     finally:
         db.close()

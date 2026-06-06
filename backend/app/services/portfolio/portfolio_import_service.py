@@ -51,7 +51,7 @@ class PortfolioImportService:
 
 def normalize_transaction(isin:str, quantity: Decimal, buy_price: Decimal, trade_date:datetime, db, portfolio_id):
     crud = StockCrud(db)
-    stock = crud.get_stock_by_isin(isin)
+    stock = crud.get_by_isin(isin)
     if not stock:
         raise NotFound(message="Stock not found with that isin")
         

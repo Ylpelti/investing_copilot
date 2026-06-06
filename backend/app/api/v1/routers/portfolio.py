@@ -79,7 +79,7 @@ def get_portfolio_positions(
     portfolio_id:int,
     portfolio_services: PortfolioService = Depends(get_portfolio_services)
 ):
-    return portfolio_services.get_portfolio_positions(portfolio_id)
+    return portfolio_services.get_portfolio_positions_read(portfolio_id)
 
 @router.get("/{portfolio_id}/charts")
 def get_portfolio_nav(

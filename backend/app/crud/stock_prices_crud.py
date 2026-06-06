@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 class StockPriceCrud(BaseCrud):
 
+    def add(self, stock_price: StockPrice) -> None:
+        self.db.add(stock_price)
+
     def get_prices(
             self,
             stock_id: int,
@@ -37,3 +40,5 @@ class StockPriceCrud(BaseCrud):
         return self.db.query(StockPrice).filter(StockPrice.stock_id == stock_id).order_by(StockPrice.date.desc()).first()
         
         
+    def get_by_id_and_date(self, stock_id:int, date: date) -> StockPrice | None:
+        return self.db.query(StockPrice).filter(StockPrice.stock_id == stock_id, StockPrice.date == date).first()
