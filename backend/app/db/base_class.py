@@ -1,6 +1,7 @@
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, DeclarativeBase
 
 # Shared declarative base for all SQLAlchemy models
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 __all__ = ["Base"]

@@ -14,7 +14,10 @@ def prices_to_df(db, txs: List[PortfolioTransaction], forward_fill: bool = True)
     start_date = min(tx.timestamp.date() for tx in txs)
     end_date = date.today()
 
-    prices = crud.read_prices_bu_stock_ids_and_date(stock_ids, start_date, end_date)
+    for stock_id in stock_ids:
+        price = crud.get_prices(stock_id, start_date, end_date, 1000, "asc")
+        prices.extend(price)
+    
 
     df = pd.DataFrame([
         {"date":p.date, "stock_id": p.stock_id, "close": float(p.close_price)} for p in prices

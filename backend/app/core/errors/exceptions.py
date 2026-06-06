@@ -29,5 +29,9 @@ class Forbidden(AppError):
 class BadRequest(AppError):
     status_code = 400
     message = "Bad request"
+
+class DuplicateStockError(AppError):
+    status_code = 409
+    message = "Stock already exists"
     
 

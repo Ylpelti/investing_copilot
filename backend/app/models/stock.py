@@ -24,6 +24,7 @@ class Stock(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+        onupdate=func.now(),
         nullable=True)
     
     positions: Mapped[list["Position"]] = relationship("Position", back_populates="stock")
