@@ -40,11 +40,6 @@ def test_ai_pipeline_real_openai_call():
         result = pipeline.run(analytics_results)
     except APIConnectionError:
         pytest.skip("OpenAI endpoint not reachable in current environment")
-    print()
-    print("-" * 20)
-    print("AI output:", result)
-    print("-" * 20)
-    print()
 
     assert isinstance(result, str)
     assert len(result.strip()) > 20

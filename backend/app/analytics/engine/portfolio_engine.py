@@ -5,9 +5,7 @@ from app.analytics.data.holdings import build_holdings_df
 from app.analytics.portfolio.NAV_r import build_NAV_r
 from app.analytics.models.returns import simple_returns, cumulative_returns, log_returns
 from app.analytics.models.risks import drawdown_curve, max_drawdown, volatility, var_cvar
-from app.analytics.utils.series_to_records import series_to_records
 from app.analytics.engine.result import PortfolioAnalyticsResult
-import matplotlib.pyplot as plt
 from app.analytics.models.performance import sharpe_ratio
 
 from app.analytics.data.market_value import market_value

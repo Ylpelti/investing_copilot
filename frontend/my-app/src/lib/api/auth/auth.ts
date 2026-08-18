@@ -1,11 +1,6 @@
 import { UserRead, UserCreate } from "@/types/user";
-import { mockUsersRead } from "../../mock/userMockData";
 import { apiRequest } from "../../requests/http";
 import { authRequest } from "@/lib/requests/authRequest";
-
-export const getUsers = async (): Promise<UserRead[]> => {
-    return mockUsersRead
-}
 
 export const registerUser = async (data: UserCreate): Promise<UserRead> => {
     

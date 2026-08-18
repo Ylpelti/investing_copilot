@@ -124,6 +124,12 @@ python -m venv venv
 venv/bin/pip install -r requirements.txt
 ```
 
+Create local backend environment variables from the example file:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
 Start PostgreSQL with Docker:
 
 ```bash
@@ -155,7 +161,7 @@ Install dependencies and start the Next.js development server:
 
 ```bash
 cd frontend/my-app
-npm install
+npm ci
 npm run dev
 ```
 
@@ -167,13 +173,13 @@ http://localhost:3000
 
 Local frontend environment:
 
-```text
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+```bash
+cp frontend/my-app/.env.local.example frontend/my-app/.env.local
 ```
 
 ## Environment Variables
 
-The backend expects these variables in `backend/.env`:
+The backend expects these variables in `backend/.env`. See `backend/.env.example` for placeholders:
 
 ```text
 APP_SECRET_KEY=change-me
@@ -184,20 +190,24 @@ APP_REFRESH_TOKEN_EXPIRE_DAYS=7
 APP_OPENAI_API_KEY=optional-for-ai-explanations
 ```
 
+The frontend expects `NEXT_PUBLIC_API_URL` in `frontend/my-app/.env.local`. See `frontend/my-app/.env.local.example`.
+
 ## Tests
 
 Run the backend test suite:
 
 ```bash
 cd backend
-MPLCONFIGDIR=/tmp/matplotlib PYTHONPATH=. venv/bin/python -m pytest
+PYTHONPATH=. venv/bin/python -m pytest
 ```
 
-Run the frontend linter:
+Run the frontend checks:
 
 ```bash
 cd frontend/my-app
+npm ci
 npm run lint
+npm run build
 ```
 
 ## Current Limitations
@@ -205,6 +215,7 @@ npm run lint
 This project is still under active development.
 
 * The frontend is currently an early-stage prototype.
+* The frontend transaction list still uses mock data because the backend currently exposes transaction creation but not a transaction-list endpoint.
 * Analytics coverage is still limited compared with the intended final scope.
 * Market-data handling and portfolio import workflows require further hardening.
 * The AI layer currently focuses mainly on explaining existing quantitative analytics rather than performing autonomous portfolio analysis.

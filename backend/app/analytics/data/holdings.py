@@ -24,7 +24,6 @@ def build_holdings_df(txs_df: pd.DataFrame, prices_df: pd.DataFrame) -> pd.DataF
         .unstack(fill_value=0)
         .sort_index()
     )
-    print(daily_tx)
     all_dates = prices_df.index
     daily_tx = daily_tx.reindex(all_dates, fill_value=0)
     holdings_df = daily_tx.cumsum()
