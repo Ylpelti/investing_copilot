@@ -1,6 +1,10 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from app.schemas.llm_provider import LLMProvider
+
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -19,7 +23,7 @@ class Settings(BaseSettings):
     
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BACKEND_DIR / ".env",
         env_prefix="APP_",
         env_file_encoding="utf-8",
         case_sensitive=False,

@@ -25,8 +25,6 @@ export const createUserAction = async (
     if (!password) throw new Error("Password required")
 
     await registerUser({ username, email, password })
-    console.log("Username: ", username);
-    console.log("Password: ", password);
     return { success: true }
   } catch (e) {
     return {
@@ -56,7 +54,7 @@ export const loginAction = async (
       path: '/'
     })
     return { success: true}
-  } catch(e) {
+  } catch {
     return {
       success: false,
       error: "Invalid username or password"

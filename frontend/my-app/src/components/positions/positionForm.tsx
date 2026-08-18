@@ -25,7 +25,7 @@ export function PositionForm({ action }: Props) {
     <form action={formAction}>
       <StockSearch onSelect={stock => setSelectedStock(stock)} />
         <input type="hidden" name="stock_id" value={selectedStock?.id ?? ""} />
-      <input type="date" name="timestamp" placeholder="transaction date" defaultValue={Date.now()}/>
+      <input type="date" name="timestamp" placeholder="transaction date" required />
       <input name="quantity" type="number" placeholder="quantity" min={1} required />
       <input name="buy_price" type="number" placeholder="buy price" step="0.01" min={0} required />
       <select name="type" id="type">

@@ -1,7 +1,6 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { createMockPosition } from "@/lib/mock/positionMockData"
 import { createTransaction } from "@/lib/api/transactions"
 import { TransactionCreate, TransactionType } from "@/types/transaction"
 

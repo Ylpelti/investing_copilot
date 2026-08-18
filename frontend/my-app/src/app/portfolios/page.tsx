@@ -21,7 +21,7 @@ const PortfolioPage = async () => {
     
     return (
         <div>
-        
+        <PortfolioList portfolios={portfolios} />
         <PortfolioForm action={boundCreatePortfolio}/>
         </div>
     )

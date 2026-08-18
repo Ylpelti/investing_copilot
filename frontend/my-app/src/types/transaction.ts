@@ -3,7 +3,7 @@ export enum TransactionType  {
     SELL = "SELL"
 }
 
-type TransactionBase = {
+export type TransactionCreate = {
     portfolio_id: number
     stock_id: number
     type: TransactionType
@@ -12,12 +12,16 @@ type TransactionBase = {
     timestamp: Date
 }
 
-export type TransactionRead = TransactionBase & {
+export type TransactionRead = {
     id:number
-    total_value: number
+    portfolio_id: number
+    stock_id: number
+    type: TransactionType
+    quantity: string
+    price: string
+    total_value: string
+    timestamp: string
 }
-
-export type TransactionCreate = TransactionBase
 
 export type TransactionFormData = {
     stock_id: number

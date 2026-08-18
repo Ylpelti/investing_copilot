@@ -1,4 +1,4 @@
-import { UserRead, UserCreate, UserLogin } from "@/types/user";
+import { UserRead, UserCreate } from "@/types/user";
 import { mockUsersRead } from "../../mock/userMockData";
 import { apiRequest } from "../../requests/http";
 import { authRequest } from "@/lib/requests/authRequest";
@@ -20,8 +20,6 @@ export const loginRequest = async (username:string, password:string) => {
     const body = new URLSearchParams()
     body.set("username", username)
     body.set("password", password)
-    console.log("username:", username);
-    console.log("passworf: ", password);
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/token`, {
         method: "POST",

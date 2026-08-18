@@ -1,4 +1,4 @@
-type StockRead = {
+export type StockRead = {
     id: number
     ticker: string
     isin: string
@@ -13,3 +13,12 @@ export type StockOption = {
   name: string
 }
 
+export type StockPrice = {
+    stock_id: number
+    date: string
+    open_price: number
+    high_price: number
+    low_price: number
+    close_price: number
+    volume: number
+}

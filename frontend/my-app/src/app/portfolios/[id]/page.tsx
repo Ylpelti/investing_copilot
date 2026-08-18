@@ -5,6 +5,7 @@ import { getPortfolioPositions } from "@/lib/api/position"
 import { getPortfolioTransactions } from "@/lib/api/transactions"
 import { PortfolioExplanation } from "@/components/portfolio/explainPortfolio"
 import { PositionForm } from "@/components/positions/positionForm"
+import { TransactionList } from "@/components/portfolio/transactionList"
 
 import { getCurrentUser } from "@/lib/api/auth/auth"
 import { createTransactionAction } from "@/actions/transactionAction"
@@ -35,6 +36,7 @@ const PortfolioDetailPage = async ({ params }: PageProps) => {
         <div>
             <h1>{portfolio.name}</h1>
             <PositionTable positions={positions}/>
+            <TransactionList transactions={transactions} />
             <PositionForm action={boundCreatePosition} />
             <PortfolioExplanation portfolioId={portfolioId}/>
         </div>

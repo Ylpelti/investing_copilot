@@ -1,19 +1,17 @@
-import { getPositions } from "@/lib/api/position"
+import { getPortfolioPositions } from "@/lib/api/position"
 import { PositionTable } from "@/components/positions/positionList"
 
 type PageProps = {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>
 }
 
 export default async function PortfolioPositionsPage  ({ params } : PageProps)  {
     const { id } = await params
     const portfolioId = Number(id)
-    console.log(portfolioId);
-    const positions = await getPositions(portfolioId)
+    const positions = await getPortfolioPositions(portfolioId)
     return (
         <PositionTable positions={positions} />
     )
 }
-

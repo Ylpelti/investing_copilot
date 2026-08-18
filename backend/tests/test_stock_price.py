@@ -1,23 +1,23 @@
+from datetime import date
+from decimal import Decimal
+
 import pytest
-from datetime import date, datetime, timedelta
-from app.models import Stock, StockPrice
+
+from app.core.errors.exceptions import BadRequest, NotFound
+from app.crud.stock_crud import StockCrud
 from app.crud.stock_prices_crud import StockPriceCrud
-from app.core.errors.exceptions import NotFound, BadRequest
-
-
-@pytest.fixture
-def test_crud(test_db):
-    return StockPriceCrud(test_db)
+from app.dto.stock_price_dto import ExternalStockPriceDTO
+from app.models import Stock, StockPrice
+from app.services.stocks.stock_price_service import StockPriceService
 
 
 @pytest.fixture
 def sample_stock(test_db):
-    """Create a stock to attach prices to."""
     stock = Stock(
         ticker="NOKIA.HE",
         isin="FI0009000681",
         name="Nokia Oyj",
-        close_price=3.45,
+        close_price=Decimal("3.45"),
         sector="Technology",
     )
     test_db.add(stock)
@@ -28,24 +28,23 @@ def sample_stock(test_db):
 
 @pytest.fixture
 def sample_prices(test_db, sample_stock):
-    """Insert a few prices for the sample stock."""
     prices = [
         StockPrice(
             stock_id=sample_stock.id,
             date=date(2025, 11, 1),
-            open_price=3.40,
-            high_price=3.50,
-            low_price=3.35,
-            close_price=3.45,
+            open_price=Decimal("3.40"),
+            high_price=Decimal("3.50"),
+            low_price=Decimal("3.35"),
+            close_price=Decimal("3.45"),
             volume=100000,
         ),
         StockPrice(
             stock_id=sample_stock.id,
             date=date(2025, 11, 2),
-            open_price=3.45,
-            high_price=3.55,
-            low_price=3.40,
-            close_price=3.50,
+            open_price=Decimal("3.45"),
+            high_price=Decimal("3.55"),
+            low_price=Decimal("3.40"),
+            close_price=Decimal("3.50"),
             volume=120000,
         ),
     ]
@@ -54,75 +53,109 @@ def sample_prices(test_db, sample_stock):
     return prices
 
 
-class TestStockPriceCrud:
-    def test_read_stock_price_success(self, test_crud, sample_prices):
-        """Ensure we can read an existing stock price."""
-        first_price = sample_prices[0]
-        result = test_crud.read_stock_price(first_price.id)
-        assert result.id == first_price.id
-        assert result.close_price == pytest.approx(3.45, rel=1e-6)
+@pytest.fixture
+def price_repo(test_db):
+    return StockPriceCrud(test_db)
 
-    def test_read_stock_price_not_found(self, test_crud):
-        """Ensure NotFound is raised for invalid ID."""
-        with pytest.raises(NotFound) as exc_info:
-            test_crud.read_stock_price(9999)
-        assert exc_info.value.status_code == 404
-        assert "not found" in exc_info.value.message.lower()
 
-    def test_read_stock_prices_by_stock_id(self, test_crud, sample_stock, sample_prices):
-        """Retrieve all prices for a stock and confirm order by date."""
-        results = test_crud.read_stock_prices_by_stock_id(sample_stock.id)
-        assert len(results) == len(sample_prices)
-        assert results[0].date < results[1].date
+@pytest.fixture
+def price_service(test_db):
+    return StockPriceService(StockCrud(test_db), StockPriceCrud(test_db))
 
-    def test_read_stock_prices_by_ticker(self, test_crud, sample_prices):
-        """Retrieve prices via ticker join."""
-        results = test_crud.read_stock_prices_by_ticker("NOKIA.HE")
-        assert len(results) == 2
-        assert all(p.stock.ticker == "NOKIA.HE" for p in results)
 
-    def test_read_stock_prices_by_ticker_not_found(self, test_crud):
-        """Empty list for non-existent ticker should raise NotFound."""
-        with pytest.raises(NotFound):
-            test_crud.read_stock_prices_by_ticker("INVALID")
+def test_stock_price_repo_get_prices_filters_and_orders(price_repo, sample_stock, sample_prices):
+    results = price_repo.get_prices(
+        stock_id=sample_stock.id,
+        start_date=date(2025, 11, 1),
+        end_date=date(2025, 11, 2),
+        limit=10,
+        order="asc",
+    )
 
-    def test_read_stock_prices_by_date_range_valid(self, test_crud, sample_stock, sample_prices):
-        """Ensure date filtering returns correct subset."""
-        start = "2025-11-01"
-        end = "2025-11-02"
-        results = test_crud.read_stock_prices_by_date_range(sample_stock.id, start, end)
-        assert len(results) == 2
-        assert all(isinstance(p.date, date) for p in results)
+    assert [price.date for price in results] == [date(2025, 11, 1), date(2025, 11, 2)]
 
-    def test_read_stock_prices_by_date_range_invalid_format(self, test_crud, sample_stock):
-        """Invalid date strings raise BadRequest."""
-        with pytest.raises(BadRequest) as exc_info:
-            test_crud.read_stock_prices_by_date_range(sample_stock.id, "invalid-date", "2025-11-01")
-        assert exc_info.value.status_code == 400
-        assert "invalid date format" in exc_info.value.message.lower()
 
-    def test_read_stock_prices_by_date_range_start_after_end(self, test_crud, sample_stock):
-        """Start date after end date should raise BadRequest."""
-        with pytest.raises(BadRequest) as exc_info:
-            test_crud.read_stock_prices_by_date_range(
-                sample_stock.id, "2025-11-10", "2025-11-01"
-            )
-        assert exc_info.value.status_code == 400
-        assert "before end_date" in exc_info.value.message.lower()
+def test_stock_price_repo_get_prices_desc_limit(price_repo, sample_stock, sample_prices):
+    results = price_repo.get_prices(
+        stock_id=sample_stock.id,
+        start_date=None,
+        end_date=None,
+        limit=1,
+        order="desc",
+    )
 
-    def test_read_stock_prices_by_date_range_no_data(self, test_crud, sample_stock):
-        """Empty range with no matching data should raise NotFound."""
-        with pytest.raises(NotFound) as exc_info:
-            test_crud.read_stock_prices_by_date_range(
-                sample_stock.id, "2024-01-01", "2024-01-05"
-            )
-        assert exc_info.value.status_code == 404
-        assert "no prices found" in exc_info.value.message.lower()
+    assert len(results) == 1
+    assert results[0].date == date(2025, 11, 2)
 
-    def test_repr_is_readable(self, sample_prices):
-        """Confirm __repr__ returns a readable summary."""
-        text = repr(sample_prices[0])
-        assert isinstance(text, str)
-        assert "Stock" in text
-        assert str(sample_prices[0].stock_id) in text
-        assert str(sample_prices[0].date) in text
+
+def test_stock_price_repo_latest_and_by_date(price_repo, sample_stock, sample_prices):
+    latest = price_repo.get_latest_price(sample_stock.id)
+    by_date = price_repo.get_by_id_and_date(sample_stock.id, date(2025, 11, 1))
+
+    assert latest.date == date(2025, 11, 2)
+    assert by_date.close_price == Decimal("3.450000")
+
+
+def test_stock_price_service_get_prices_validates_stock(price_service):
+    with pytest.raises(NotFound):
+        price_service.get_prices(9999, None, None, limit=10, order="asc")
+
+
+def test_stock_price_service_rejects_invalid_date_range(price_service, sample_stock):
+    with pytest.raises(BadRequest):
+        price_service.get_prices(sample_stock.id, date(2025, 11, 2), date(2025, 11, 1), 10, "asc")
+
+
+def test_stock_price_service_get_latest_price(price_service, sample_stock, sample_prices):
+    latest = price_service.get_latest_price(sample_stock.id)
+
+    assert latest.date == date(2025, 11, 2)
+
+
+def test_stock_price_service_latest_missing_price_raises(price_service, sample_stock):
+    with pytest.raises(NotFound):
+        price_service.get_latest_price(sample_stock.id)
+
+
+def test_stock_price_service_add_price_if_missing(test_db, price_service, sample_stock):
+    dto = ExternalStockPriceDTO(
+        date=date(2025, 11, 3),
+        open_price=Decimal("3.50"),
+        high_price=Decimal("3.60"),
+        low_price=Decimal("3.45"),
+        close_price=Decimal("3.55"),
+        volume=130000,
+    )
+
+    price_service.add_price_if_missing(sample_stock.id, dto)
+    test_db.commit()
+
+    price_service.add_price_if_missing(sample_stock.id, dto)
+    test_db.commit()
+
+    prices = test_db.query(StockPrice).filter_by(stock_id=sample_stock.id, date=date(2025, 11, 3)).all()
+    assert len(prices) == 1
+    assert prices[0].close_price == Decimal("3.550000")
+
+
+def test_stock_price_api_routes(client, test_db, sample_stock, sample_prices):
+    prices = client.get(f"/api/v1/stocks/{sample_stock.id}/prices?limit=10&order=asc")
+    latest = client.get(f"/api/v1/stocks/{sample_stock.id}/prices/latest")
+
+    assert prices.status_code == 200
+    assert [item["date"] for item in prices.json()] == ["2025-11-01", "2025-11-02"]
+    assert latest.status_code == 200
+    assert latest.json()["date"] == "2025-11-02"
+
+
+def test_stock_price_api_missing_stock_returns_404(client):
+    assert client.get("/api/v1/stocks/9999/prices").status_code == 404
+    assert client.get("/api/v1/stocks/9999/prices/latest").status_code == 404
+
+
+def test_stock_price_repr_is_readable(sample_prices):
+    text = repr(sample_prices[0])
+
+    assert "StockPrice" in text
+    assert str(sample_prices[0].stock_id) in text
+    assert str(sample_prices[0].date) in text

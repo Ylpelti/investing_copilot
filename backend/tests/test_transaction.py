@@ -27,7 +27,7 @@ def transaction_service(test_db, test_user):
         portfolio_repo=PortfolioCrud(test_db),
         position_repo=PositionCrud(test_db),
     )
-    stock_service = StockService(stock_repo=StockCrud(test_db))
+    stock_service = StockService(stock_repo=StockCrud(test_db), db=test_db)
     return TransactionService(
         db=test_db,
         tx_repo=tx_repo,

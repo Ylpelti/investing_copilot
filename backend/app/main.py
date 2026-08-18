@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+import logging
+
+from app.core.config import settings
 from app.db.session import engine, Base
 from app.api.v1.api import api_router as api_v1_router
 from app.db.session import SessionLocal
@@ -9,13 +12,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models.stock import Stock
 from app.json.ticker_map import load_ticker_map
 
+logger = logging.getLogger(__name__)
 
 origins = [
-    "https://localhost:3000"
+    "http://localhost:3000",
+    "https://localhost:3000",
 ]
 
 
-app = FastAPI(debug=True)
+app = FastAPI(debug=settings.environment == "development")
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +49,7 @@ def startup_event():
             stock_sync.sync_from_mapping(ticker_map)
             stock_price_sync.sync_all()
             
-            print("Database initialized with stock data.")
+            logger.info("Database initialized with stock data.")
     finally:
         db.close()
 

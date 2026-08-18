@@ -8,7 +8,6 @@ export const getPortfolioTransactions = async (portfolio_id: number): Promise<Tr
 }
 
 export const createTransaction = async (data: TransactionCreate) => {
-    console.log(data);
     return authRequest("/transactions", {
         method: "POST",
         body: JSON.stringify(data)
